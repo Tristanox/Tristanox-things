@@ -17,28 +17,28 @@
       --text:    #dde3ef;
       --muted:   #4b5467;
       --green:   #4ade80;
+      --synth:   #a78bfa;
+      --effect:  #fb923c;
     }
-    html, body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Outfit', sans-serif;
-      font-size: 15px;
-    }
+    html, body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; font-size: 15px; }
     body::before {
-      content: '';
-      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
       opacity: 0.025;
     }
     .orb { position: fixed; border-radius: 50%; pointer-events: none; filter: blur(100px); z-index: 0; }
     .orb-1 { width: 500px; height: 500px; background: #1a3a6e; top: -180px; right: -120px; opacity: 0.5; }
     .orb-2 { width: 400px; height: 400px; background: #2d1b5e; bottom: -100px; left: -100px; opacity: 0.45; }
+
     .page { position: relative; z-index: 1; max-width: 1080px; margin: 0 auto; padding: 0 28px 80px; }
-    header { padding: 72px 0 56px; }
+    header { padding: 72px 0 48px; }
     .eyebrow { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px; opacity: 0.85; }
     h1 { font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 700; letter-spacing: -0.025em; line-height: 1.1; }
     .sub { margin-top: 12px; color: var(--muted); font-size: 14px; font-weight: 300; }
-    .search-wrap { position: relative; margin-bottom: 48px; max-width: 400px; }
+
+    /* ── CONTROLS ── */
+    .controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 40px; }
+    .search-wrap { position: relative; flex: 1; min-width: 200px; max-width: 360px; }
     .search-wrap svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
     input[type="search"] {
       width: 100%; background: var(--surface); border: 1px solid var(--border);
@@ -48,71 +48,166 @@
     }
     input[type="search"]:focus { border-color: rgba(91,156,246,0.4); }
     input[type="search"]::placeholder { color: var(--muted); }
+
+    .filters { display: flex; gap: 6px; }
+    .f-btn {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+      padding: 9px 16px; color: var(--muted); font-family: 'Outfit', sans-serif;
+      font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.18s;
+    }
+    .f-btn:hover { color: var(--text); border-color: rgba(255,255,255,0.15); }
+    .f-btn.active-all   { border-color: rgba(91,156,246,0.4); color: var(--accent); background: rgba(91,156,246,0.07); }
+    .f-btn.active-synth { border-color: rgba(167,139,250,0.4); color: var(--synth); background: rgba(167,139,250,0.07); }
+    .f-btn.active-effect{ border-color: rgba(251,146,60,0.4);  color: var(--effect); background: rgba(251,146,60,0.07); }
+    .f-btn.active-starred { border-color: rgba(250,204,21,0.5); color: #facc15; background: rgba(250,204,21,0.07); }
+    .f-btn.star-btn { font-size: 16px; padding: 7px 13px; line-height: 1; }
+
+    /* ── GRID ── */
     .grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
     @media (max-width: 820px) { .grid { grid-template-columns: repeat(2,1fr); } }
     @media (max-width: 520px) { .grid { grid-template-columns: 1fr; } }
+
+    /* ── CARD ── */
     .card {
       background: var(--card); border: 1px solid var(--border); border-radius: 14px;
       overflow: hidden; display: flex; flex-direction: column;
       transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
       animation: up 0.4s ease both;
     }
-    .card:hover { border-color: rgba(91,156,246,0.25); transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.35); }
+    .card:hover { border-color: rgba(91,156,246,0.22); transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.35); }
     @keyframes up { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
-    .card-img { width:100%; aspect-ratio:16/9; background:#0a0d16; overflow:hidden; display:flex; align-items:center; justify-content:center; }
+
+    .card-img {
+      width: 100%; aspect-ratio: 16/9; background: #0a0d16;
+      overflow: hidden; display: flex; align-items: center; justify-content: center;
+      position: relative; cursor: pointer;
+    }
     .card-img img { width:100%; height:100%; object-fit:cover; transition:transform 0.35s; display:block; }
     .card:hover .card-img img { transform: scale(1.04); }
     .placeholder { color:var(--muted); font-size:11px; letter-spacing:0.1em; text-transform:uppercase; }
-    .card-body { padding: 16px 18px 18px; display:flex; flex-direction:column; gap:12px; flex:1; }
-    .card-name { font-size:15px; font-weight:600; letter-spacing:-0.01em; }
-    .card-desc { font-size:12.5px; color:var(--muted); line-height:1.55; flex:1; }
-    .card-foot { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:2px; }
+
+    /* zoom hint */
+    .zoom-hint {
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0); transition: background 0.2s; pointer-events: none;
+    }
+    .zoom-hint svg { opacity: 0; transform: scale(0.8); transition: opacity 0.2s, transform 0.2s; color: white; }
+    .card-img:hover .zoom-hint { background: rgba(0,0,0,0.35); }
+    .card-img:hover .zoom-hint svg { opacity: 1; transform: scale(1); }
+
+    /* type badge on image */
+    .type-badge {
+      position: absolute; top: 9px; left: 9px;
+      font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+      border-radius: 6px; padding: 3px 9px;
+    }
+    .type-badge.synth  { background: rgba(167,139,250,0.15); border: 1px solid rgba(167,139,250,0.3); color: var(--synth); }
+    .type-badge.effect { background: rgba(251,146,60,0.12);  border: 1px solid rgba(251,146,60,0.3);  color: var(--effect); }
+
+    /* star on image */
+    .star-badge {
+      position: absolute; top: 8px; right: 8px;
+      font-size: 14px; line-height: 1;
+      filter: drop-shadow(0 1px 4px rgba(0,0,0,0.6));
+    }
+
+    .card-body { padding: 14px 16px 16px; display:flex; flex-direction:column; gap:10px; flex:1; }
+    .card-name { font-size:14px; font-weight:600; letter-spacing:-0.01em; }
+    .card-desc { font-size:12px; color:var(--muted); line-height:1.55; flex:1; }
+    .card-foot { display:flex; align-items:center; justify-content:space-between; gap:8px; }
     .btn-get {
       display:inline-flex; align-items:center; gap:7px;
       background: rgba(91,156,246,0.1); border: 1px solid rgba(91,156,246,0.22);
-      border-radius:8px; padding:7px 15px; color:var(--accent);
+      border-radius:8px; padding:7px 14px; color:var(--accent);
       font-family:'Outfit',sans-serif; font-size:12px; font-weight:600;
       letter-spacing:0.02em; text-decoration:none; transition:all 0.18s;
     }
     .btn-get:hover { background:rgba(91,156,246,0.18); border-color:rgba(91,156,246,0.5); }
-    .free-badge { font-size:10px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:var(--green); border:1px solid rgba(74,222,128,0.2); border-radius:6px; padding:3px 8px; }
+    .free-badge { font-size:10px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:var(--green); border:1px solid rgba(74,222,128,0.18); border-radius:6px; padding:3px 8px; }
+
     .empty { grid-column:1/-1; text-align:center; padding:64px 0; color:var(--muted); font-size:13px; }
+
+    /* ── LIGHTBOX ── */
+    #lightbox {
+      position: fixed; inset: 0; z-index: 100;
+      background: rgba(4,6,12,0.92); backdrop-filter: blur(12px);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.25s;
+    }
+    #lightbox.open { opacity: 1; pointer-events: all; }
+    #lightbox img {
+      max-width: min(900px, 92vw); max-height: 85vh;
+      border-radius: 12px; box-shadow: 0 32px 80px rgba(0,0,0,0.7);
+      transform: scale(0.94); transition: transform 0.25s;
+      display: block;
+    }
+    #lightbox.open img { transform: scale(1); }
+    #lb-close {
+      position: fixed; top: 22px; right: 26px;
+      background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px; padding: 8px 14px;
+      color: var(--muted); font-family: 'Outfit', sans-serif; font-size: 12px;
+      cursor: pointer; letter-spacing: 0.05em; transition: all 0.18s;
+    }
+    #lb-close:hover { color: var(--text); background: rgba(255,255,255,0.1); }
+
     footer { border-top:1px solid var(--border); margin-top:72px; padding-top:28px; font-size:12px; color:var(--muted); }
   </style>
 </head>
 <body>
 <div class="orb orb-1"></div>
 <div class="orb orb-2"></div>
+
+<!-- LIGHTBOX -->
+<div id="lightbox">
+  <button id="lb-close">ESC &nbsp;✕</button>
+  <img id="lb-img" src="" alt="" />
+</div>
+
 <div class="page">
   <header>
     <div class="eyebrow">Collection personnelle</div>
-    <h1>Tristanox plugins</h1>
-    <p class="sub">Les meilleurs VST gratuits que j'ai trouvés sur internet — partagés pour vous :)</p>
+    <h1>Free Orbit</h1>
+    <p class="sub">Les meilleurs VST gratuits que j'ai trouvés sur internet — partagés avec la communauté.</p>
   </header>
-  <div class="search-wrap">
-    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-      <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
-    </svg>
-    <input type="search" id="search" placeholder="Rechercher…" />
+
+  <div class="controls">
+    <div class="search-wrap">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+      </svg>
+      <input type="search" id="search" placeholder="Rechercher…" />
+    </div>
+    <div class="filters">
+      <button class="f-btn active-all"  data-f="all">Tous</button>
+      <button class="f-btn"             data-f="synth">Synth</button>
+      <button class="f-btn"             data-f="effect">Effect</button>
+      <button class="f-btn star-btn"    data-f="starred">★</button>
+    </div>
   </div>
+
   <div class="grid" id="grid"></div>
 </div>
+
 <footer>
   <div class="page" style="padding-top:0;padding-bottom:32px">
-    Tristanox — tous les plugins appartiennent à leurs auteurs respectifs.
+    Free Orbit — tous les plugins appartiennent à leurs auteurs respectifs.
   </div>
 </footer>
+
 <script>
 /* ================================================================
    ✦  COLLECTION — AJOUTER UN PLUGIN
    ---------------------------------------------------------------
-   Copie ce bloc et remplis les champs :
+   Copie un bloc { ... } et remplis les champs :
 
    {
-     name : "Nom du plugin",
-     url  : "https://lien-de-telechargement.com",
-     img  : "https://lien-vers-image.png",   // "" = pas d'image
-     desc : "Description courte.",            // "" = pas de description
+     name      : "Nom du plugin",
+     type      : "synth",                          // "synth" ou "effect"
+     isstarred : 0,                                // 1 = favori ★  |  0 = normal
+     url       : "https://lien-de-telechargement.com",
+     img       : "https://lien-vers-image.png",    // "" = pas d'image
+     desc      : "Description courte.",            // "" = pas de description
    },
 
    ================================================================ */
@@ -124,6 +219,7 @@ const PLUGINS = [
     url  : "https://tugrulakyuz.gumroad.com/l/rakfr?layout=profile",
     img  : "https://public-files.gumroad.com/xsopwlgjxof9mtmlwpgzz01jha3p",
     desc : "a VST3 plugin that turns any image into a playable wavetable instrument.",
+    type : "synth",
   },
 
   {
@@ -131,6 +227,7 @@ const PLUGINS = [
     url  : "https://tugrulakyuz.gumroad.com/l/ixzwq?layout=profile",
     img  : "https://public-files.gumroad.com/na5m60l7ao7ir4jaee842ylo8pqc",
     desc : "VST3 audio fx plugin that brings 2D positioning to audio effects processing.",
+    type : "effect",
   },
 
   {
@@ -138,6 +235,7 @@ const PLUGINS = [
     url  : "https://tugrulakyuz.gumroad.com/l/xtwcn?layout=profile",
     img  : "https://public-files.gumroad.com/4dwod6ljq5h75rkh0l5olyzrneoa",
     desc : "This is not a simple delay — it is a sound transformation instrument.",
+    type : "effect",
   },
 
   {
@@ -145,6 +243,7 @@ const PLUGINS = [
     url  : "https://tugrulakyuz.gumroad.com/l/ssxrm?layout=profile",
     img  : "https://public-files.gumroad.com/4xenyub1uo7twgzfjhrzbpwfl4jy",
     desc : "an experimental fx vst3 plugin that takes sound manipulation by allowing to scan an image and dynamically shape the incoming audio of a track using the pixel values",
+    type : "effect",
   },
 
   {
@@ -152,6 +251,7 @@ const PLUGINS = [
     url  : "https://deadloop.fr/moonverb",
     img  : "https://deadloop.fr/img/moonverb-screenshot.png",
     desc : "MoonVerb is a free shimmer reverb plugin. Turn any sound into an ethereal atmosphere.",
+    type : "effect",
   },
 
   {
@@ -159,6 +259,7 @@ const PLUGINS = [
     url  : "https://lese.io/plugin/teuri/",
     img  : "https://lese.io/wp-content/uploads/edd/2026/03/teuri_shadow_solidbg2-1024x1024.png.webp",
     desc : "an unpredictable distortion that destroys the sound, but does it well.",
+    type : "effect",
   },
 
   {
@@ -166,6 +267,7 @@ const PLUGINS = [
     url  : "https://lese.io/plugin/smear/",
     img  : "https://lese.io/wp-content/uploads/edd/2025/10/smear_shadow_solidbg-1024x1024.png",
     desc : "Spectral Chaos",
+    type : "effect",
   },
 
   {
@@ -180,6 +282,8 @@ const PLUGINS = [
     url  : "https://lese.io/plugin/codec/",
     img  : "https://lese.io/wp-content/uploads/edd/2025/05/codec2_solidbg-1024x1024.jpg.webp",
     desc : "Modern Degradation and bitcrush. A must I think.",
+    type : "effect",
+    isstarred : 1, 
   },
 
 
@@ -188,6 +292,7 @@ const PLUGINS = [
     url  : "https://lese.io/plugin/glow/",
     img  : "https://lese.io/wp-content/uploads/edd/2022/09/glow_shadow_solidbg-991x991.png.webp",
     desc : "Mass Granulator",
+    type : "effect",
   },
 
   {
@@ -195,6 +300,7 @@ const PLUGINS = [
     url  : "https://lese.io/plugin/sweep/",
     img  : "https://lese.io/wp-content/uploads/edd/2024/04/sweep_shadow_solidbg-1024x1024.png.webp",
     desc : "Sweep uses a bunch of filters to make your sound feel like it’s rising (or falling) endlessly.",
+    type : "effect",
   },
 
   {
@@ -202,6 +308,7 @@ const PLUGINS = [
     url  : "https://github.com/Mrugalla/susquash",
     img  : "https://user-images.githubusercontent.com/54960398/140665941-9c6090f5-d7d1-48e9-b8e0-621859b4b097.PNG",
     desc : "a plugin that crushes shit massively - by Mrugalla",
+    type : "effect",
   },
 
   {
@@ -209,6 +316,7 @@ const PLUGINS = [
     url  : "https://github.com/Mrugalla/JIF",
     img  : "https://user-images.githubusercontent.com/54960398/120898923-6b3e3900-c62d-11eb-83bf-148d796b4515.png",
     desc : "a VST3 Pluginthat loops a GIF to the tempo of your beat - by Mrugalla",
+    type : "effect",
   },
 
   {
@@ -216,6 +324,7 @@ const PLUGINS = [
     url  : "https://github.com/Mrugalla/Manta",
     img  : "https://user-images.githubusercontent.com/54960398/201516860-36b911e8-fd7c-4cbd-b187-147ccdaefb5e.png",
     desc : "a resonator with extra steps - by Mrugalla",
+    type : "effect",
   },
 
   {
@@ -230,6 +339,7 @@ const PLUGINS = [
     url  : "https://dillonbastan.com/store/plugin/index.php?product=entanglement-plugin",
     img  : "https://dillonbastan.com/store/plugin/entanglement-plugin/media/cover1.png",
     desc : "Entanglement uses a 1D quantum wave function (Schrödinger equation) to produce evolving waveforms for use in a dual polyphonic wavetable synthesizer. (=weird thing, try)",
+    type : "effect",
   },
 
   {
@@ -245,6 +355,7 @@ const PLUGINS = [
     url  : "https://sugar-bytes.de/graindad",
     img  : "https://sugar-bytes.de/storage/app/media/graindad/s1.jpg",
     desc : "Graindad is a granular effect for high quality realtime audio manipulation. ",
+    type : "effect",
   },
 
   {
@@ -252,6 +363,7 @@ const PLUGINS = [
     url  : "https://expdsp.com/",
     img  : "https://expdsp.com/exp-filtertable/lite%201.0.0.webp",
     desc : "It's like a filter version of a wavetable. Complex filtering that is difficult with conventional methods can be easily performed.",
+    type : "effect",
   },
 
   {
@@ -259,6 +371,7 @@ const PLUGINS = [
     url  : "https://www.minimal.audio/products/squash",
     img  : "https://www.minimal.audio/assets/v2/plugins/squash/squash-cf76135bc798041a738a7b97b8af77a668ca10dc81a655ccddc8e4ea740af2ca.webp",
     desc : "OTT-style compressor but with a creamier interface. (creamy ? wtf)",
+    type : "effect",
   },
 
   {
@@ -266,6 +379,7 @@ const PLUGINS = [
     url  : "https://deadrobotmusic.gumroad.com/l/etherealdelay1?layout=profile",
     img  : "https://public-files.gumroad.com/4nid75aakv9emvq4tuscsmizl5mn",
     desc : "Creative Delay VST by Dead Robot. A send (bus) style delay effect, with autopan, filters, saturation, and reverb, for unique, textured, spacious, ethereal delays",
+    type : "effect",
   },
 
   {
@@ -273,6 +387,7 @@ const PLUGINS = [
     url  : "https://deadrobotmusic.gumroad.com/l/etherealverb?layout=profile",
     img  : "https://public-files.gumroad.com/fxlowkhi62peecldfx00p8geenoz",
     desc : " a send (bus) style convolution reverb, with separate low pass and high pass filters for both dry and wet signals, and a wet input knob to automate and “throw” reverb in a pleasing way. Perfect for ethereal vocals, synths, pianos, guitar, and beautiful cinematic ambient soundscapes. By Dead Robot.",
+    type : "effect",
   },
 
   {
@@ -280,6 +395,7 @@ const PLUGINS = [
     url  : "https://www.molecularbytes.com/mbcms/index.php/products/free-products/atomicreverb-free",
     img  : "https://www.molecularbytes.com/mbcms/media/cached-resp-images/images/products/AtomicReverb/Images/AR2.0_Free_Big_Screenshot_flat_960.webp?version=e7e94b37da962d729a8d6c79cc1c1162",
     desc : "brings natural space and musical depth to your productions, focusing on the essentials of room and hall simulation",
+    type : "effect",
   },
 
   {
@@ -294,6 +410,8 @@ const PLUGINS = [
     url  : "https://michaelwillis.github.io/dragonfly-reverb/",
     img  : "https://michaelwillis.github.io/dragonfly-reverb/images/collage.png",
     desc : "Just insane. IF you need 1 REVERB, it's this bundle. Contains plate, room, hall, and reflections. The best.",
+    type : "effect",
+    isstarred : 1, 
   },
 
 
@@ -302,6 +420,7 @@ const PLUGINS = [
     url  : "https://zillasound.com/zillaheat/",
     img  : "https://static.kvraudio.com/i/b/heat_background.jpg",
     desc : "Zilla Heat is a free dynamic saturation and parallel bass exciter plugin designed to add massive analog character and warmth to your tracks without destroying your low-end.",
+    type : "effect",
   },
 
   {
@@ -309,6 +428,7 @@ const PLUGINS = [
     url  : "https://www.patreon.com/posts/157878786",
     img  : "https://static.kvraudio.com/i/b/mimer_v100.png",
     desc : "Mimer-verb is a new free Noisebud reverb built from impulse responses recorded inside Mimerlaven, the old mining headframe in Norberg, Sweden. It won't be perfect, it will be natural.",
+    type : "effect",
   },
 
   {
@@ -316,6 +436,7 @@ const PLUGINS = [
     url  : "https://www.420plugins.com/",
     img  : "https://www.420plugins.com/wp-content/uploads/plugin-media/images/420_Swell_Fella.webp",
     desc : "Expressive auto-swell movement for ambient textures and cinematic parts. ON THE WEBSITE, there are a lot. You have to click on this one particularly.",
+    type : "effect",
   },
 
   {
@@ -323,6 +444,7 @@ const PLUGINS = [
     url  : "https://warmthdev.gumroad.com/l/touched-lite",
     img  : "https://freevstplugins.net/wp-content/uploads/2026/05/Touched-Lite.webp",
     desc : "They call it shoegaze-in-a-box.",
+    type : "effect",
   },
 
   {
@@ -330,6 +452,7 @@ const PLUGINS = [
     url  : "https://warmthdev.gumroad.com/l/bit-crusher?layout=profile",
     img  : "https://warmth.dev/images/products/bit-crusher.png",
     desc : "Reduce digital fidelity creating a classic electronic effect.",
+    type : "effect",
   },
 
   {
@@ -337,6 +460,7 @@ const PLUGINS = [
     url  : "https://warmthdev.gumroad.com/l/evergreen?layout=profile",
     img  : "https://warmth.dev/images/products/evergreen.png",
     desc : "Add classic overdrive simulating a physical guitar stompbox.",
+    type : "effect",
   },
 
   {
@@ -344,6 +468,7 @@ const PLUGINS = [
     url  : "https://warmthdev.gumroad.com/l/stripes?layout=profile",
     img  : "https://warmth.dev/images/products/stripes.png",
     desc : "Classic phaser effect suitable for guitars and other instruments.",
+    type : "effect",
   },
 
   {
@@ -351,6 +476,7 @@ const PLUGINS = [
     url  : "https://cosmicaudio.gumroad.com/l/cosmicsuite",
     img  : "https://static.kvraudio.com/i/b/cosmic-suite.webp",
     desc : "26 free one-knob plugins for music producers and audio engineers. VST3 + AU only. Mac + Windows. One dial each. No presets, no menus. INSANE value.",
+    type : "effect",
   },
 
 
@@ -359,6 +485,8 @@ const PLUGINS = [
     url  : "https://dawjunkie.com/product/knobs/",
     img  : "https://static.kvraudio.com/i/s/knobsscreenshot.jpg",
     desc : "The “happy accident” generator. It’s time to get random with this free multi-effects generator. Throw it on a track and see what happens. It could make it better or worse, but there’s only one way to find out.",
+    type : "effect",
+    isstarred : 1, 
   },
 
   {
@@ -380,6 +508,7 @@ const PLUGINS = [
     url  : "https://dawjunkie.com/product/lil-miss-doubler/",
     img  : "https://dawjunkie.com/wp-content/uploads/2025/11/LilMissDoublerScreenshot.jpg",
     desc : "A fast, easy and great sounding vocal doubler.",
+    type : "effect",
   },
 
   {
@@ -387,6 +516,7 @@ const PLUGINS = [
     url  : "https://dawjunkie.com/product/craze/",
     img  : "https://dawjunkie.com/wp-content/uploads/2025/12/CrazeScreenshot1.jpg",
     desc : "Add that movement and grit your tracks need to make them unique with this free crunchy phase effect.",
+    type : "effect",
   },
 
   {
@@ -401,6 +531,7 @@ const PLUGINS = [
     url  : "https://giannichiarello.com/NiceStompsPlugins/",
     img  : "https://giannichiarello.com/NiceStompsPlugins/images/MasterLM%20GUI.png",
     desc : "This being free is crazy. AI-powered mastering plugin that connects to local LLMs for automatic audio analysis and precise parameter adjustments.",
+    type : "effect",
   },
 
   {
@@ -408,6 +539,7 @@ const PLUGINS = [
     url  : "https://saintmikedsp.com/plugins/pitchcure",
     img  : "https://framerusercontent.com/images/P8F0na9ehf9puwjV3vM5l5XDiyQ.png?scale-down-to=512&width=870&height=870",
     desc : "Great vocal tuner and pitch corrector, just try it",
+    type : "effect",
   },
 
 
@@ -416,6 +548,7 @@ const PLUGINS = [
     url  : "https://saintmikedsp.com/plugins/vocal-acrobatics",
     img  : "https://framerusercontent.com/images/TCOo7pjukccibTLIk8RmGQi4zTM.png?scale-down-to=512&width=886&height=886",
     desc : "Vocal Acrobatics is all about keeping basic vocal processing simple. Instead of throwing multiple plugins into your vocal chain to control dynamics, this plugin aims to get you 90% of the way there with just a handful of controls.",
+    type : "effect",
   },
 
   {
@@ -423,6 +556,7 @@ const PLUGINS = [
     url  : "https://saintmikedsp.com/plugins/ceiling-fan",
     img  : "https://framerusercontent.com/images/6KUs4AnCrPtRWCmR00TVhLSMWA.png?scale-down-to=512&width=915&height=915",
     desc : "Clipper and Limiter. Ceiling Fan was born out of the desire to create extremely loud and distorted music that somehow still sounded clean and High-Quality.",
+    type : "effect",
   },
 
   {
@@ -430,6 +564,7 @@ const PLUGINS = [
     url  : "https://github.com/leomccormack/SPARTA",
     img  : "https://github.com/leomccormack/SPARTA/raw/master/sparta_screenshot.png",
     desc : "Advanced tools. A collection of spatial audio plug-ins developed using JUCE",
+    type : "effect",
   },
 
   {
@@ -437,6 +572,7 @@ const PLUGINS = [
     url  : "https://forever89.studio/#download",
     img  : "https://forever89.studio/wp-content/uploads/2025/07/1-Tonal-Mode-1024x808.webp",
     desc : "Crazy drum machine giving unlimited sound design possibilities. Create unique sounds. It is just insane. Really. And free.",
+    isstarred : 1, 
   },
 
   {
@@ -444,6 +580,7 @@ const PLUGINS = [
     url  : "https://plugins.iem.at/download/",
     img  : "https://i.ytimg.com/vi/wTNe4P6sYTg/maxresdefault.jpg",
     desc : "VERY Advanced scientific plugins, but has interesting things. Contains GranularEncoder, SceneRotator, BinauralDecorder and 20+... See ? you don't undestrand. ",
+    type : "effect",
   },
 
   {
@@ -451,6 +588,8 @@ const PLUGINS = [
     url  : "https://www.audiopluginsforfree.com/ambience/",
     img  : "https://www.audiopluginsforfree.com/wp-content/uploads/2015/02/ambience_3.jpg",
     desc : "Ambience is a reverb that rivals the quality of the best commercial reverbs, with a lot of presets.",
+    type : "effect",
+    isstarred : 1, 
   },
 
   {
@@ -458,6 +597,7 @@ const PLUGINS = [
     url  : "https://static.kvraudio.com/files/1546/ignite_amps_the_anvil_3_0_0_win.zip",
     img  : "https://www.igniteamps.com/images/software/ignite-amps-the-anvil-software.jpg",
     desc : "The Anvil is a digital emulation of a three channels tube preamplifier for guitar. CHECK THEIR WEBSITE FOR 10+ OTHER FREE AMPS !",
+    type : "effect",
   },
 
   {
@@ -473,6 +613,7 @@ const PLUGINS = [
     url  : "https://www.decentsamples.com/product/decent-sampler-plugin/",
     img  : "https://www.audiopluginsforfree.com/wp-content/uploads/2022/09/screen-shot-2022-08-06-at-71122-am-1024x538.png",
     desc : "A FREE sampling plugin that allows you to play samples in the Decent Sampler format. Good for realistic pianos and guitars. Builtin library, no login.",
+    isstarred : 1, 
   },
 
   {
@@ -487,6 +628,7 @@ const PLUGINS = [
     url  : "https://vst.unplug.red/prisma",
     img  : "https://rekkerd.org/wp-content/uploads/2022/12/UnplugRed-Prisma.jpg",
     desc : "multiband distortion plugin for advanced tone shaping.up to four modules can be added to any one of the four bands. as of writing, there are 22 modules available to choose from. Thanks to unplugred :)",
+    type : "effect",
   },
 
   {
@@ -494,6 +636,7 @@ const PLUGINS = [
     url  : "https://vst.unplug.red/crmbl",
     img  : "https://static.kvraudio.com/i/b/ui.1670125328.png",
     desc : "Delay for insane people. Thanks to unplugred :)",
+    type : "effect",
   },
 
   {
@@ -501,6 +644,7 @@ const PLUGINS = [
     url  : "https://vst.unplug.red/sunburnt",
     img  : "https://www.audiopluginsforfree.com/wp-content/uploads/2024/09/sunburnt.webp",
     desc : "unique reverb plugin whose characteristics you can draw in the form of a curve. Thanks to unplugred :)",
+    type : "effect",
   },
 
   {
@@ -508,6 +652,7 @@ const PLUGINS = [
     url  : "https://vst.unplug.red/pisstortion",
     img  : "https://static.kvraudio.com/i/b/ui.1667504289.png",
     desc : "harsh and metallic fold distortion with a lot of controls and an innovative stereo widening algorithm. Thanks to unplugred :)",
+    type : "effect",
   },
 
   {
@@ -515,6 +660,8 @@ const PLUGINS = [
     url  : "https://vst.unplug.red/modman",
     img  : "https://bedroomproducersblog.com/wp-content/uploads/2025/08/Unplugred-ModMan.jpg",
     desc : "modulation effect that produces organic and ever changing randomized movements, based on a perlin noise algorithm. Thanks to unplugred :)",
+    type : "effect",
+    isstarred : 1, 
   },
 
   {
@@ -522,6 +669,7 @@ const PLUGINS = [
     url  : "https://vst.unplug.red/redbass",
     img  : "https://i.ytimg.com/vi/4iIJjWvpb_s/hq720.jpg?sqp=-oaymwE7CK4FEIIDSFryq4qpAy0IARUAAAAAGAElAADIQj0AgKJD8AEB-AG-B4AC0AWKAgwIABABGGAgYChgMA8=&rs=AOn4CLDe1C_yvKOy4Dfd9M3xFxsJyvJvGQ",
     desc : "Low-end enhancer. sub oscillator sidechained to incoming signal. Thanks to unplugred :)",
+    type : "effect",
   },
 
   {
@@ -529,6 +677,7 @@ const PLUGINS = [
     url  : "https://vst.unplug.red/magiccarpet",
     img  : "https://bedroomproducersblog.com/wp-content/uploads/2025/03/Unplugred-MagicCarpet.jpg",
     desc : "hree delay lines with a shared feedback path, makes a delay that starts sparse but continues to get denser with each feedback. Thanks to unplugred :)",
+    type : "effect",
   },
 
   {
@@ -536,6 +685,7 @@ const PLUGINS = [
     url  : "https://vst.unplug.red/dietaudio",
     img  : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8gdrhiFSgeTYO9FVu8HSDdxk8777Vm7uOJw&s",
     desc : "a spectral gate plugin with a unique sound, very good at separating transient information from the rest of the audio. Thanks to unplugred :)",
+    type : "effect",
   },
 
   {
@@ -543,6 +693,7 @@ const PLUGINS = [
     url  : "https://babyaud.io/freebies",
     img  : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQG-jKNRFDAv0M9qufTobSBkZbEVCctNGTX2w&s",
     desc : "It lets you speed up or slow down audio for creative effects. You WILL get 3 other mid plugins when downloading, there is no other way :(",
+    type : "effect",
   },
 
   {
@@ -550,6 +701,8 @@ const PLUGINS = [
     url  : "https://imagi.ro/product/autochroma",
     img  : "https://imagi.ro/img/autochroma/main.png",
     desc : "THE BEST granular effects. Fun to use, nothing else to say. The demo doesn't have the UI but lets you play with the presets forever.",
+    type : "effect",
+    isstarred : 1, 
   },
 
   {
@@ -557,6 +710,8 @@ const PLUGINS = [
     url  : "https://www.erikssonjonas.com/tapefiasco",
     img  : "https://www.audiopluginsforfree.com/wp-content/uploads/2026/01/capture-decran-2026-01-26-a-095709-1024x669.jpg",
     desc : "Tape Fiasco is a creative audio effect plugin that combines three distinct time-based effects: Stretch (granular time-stretching), Varispeed (tape-style speed manipulation), and Stutter (rhythmic slicing and repetition).",
+    type : "effect",
+    isstarred : 1, 
   },
 
   {
@@ -564,6 +719,7 @@ const PLUGINS = [
     url  : "https://camelcrusher.com/",
     img  : "https://cdn-jjnmf.nitrocdn.com/rnBitZRkrOWnBIMNSiBZRPOxbfErdmQW/assets/images/optimized/rev-8ec52f7/camelcrusher.com/wp-content/uploads/2023/07/CamelCrusher-1.jpg",
     desc : "Powerful but simple distorsion, with a lot of presets. A classic.",
+    type : "effect",
   },
 
   {
@@ -571,6 +727,7 @@ const PLUGINS = [
     url  : "https://cymatics.fm/products/deja-vu-plugin",
     img  : "https://auditory1.com/wp-content/uploads/2023/11/Cymatics-DejaVu-Interface.png",
     desc : "Time Warping FX Plugin. The reference in this domain.",
+    type : "effect",
   },
 
   {
@@ -578,6 +735,7 @@ const PLUGINS = [
     url  : "https://cymatics.fm/pages/diablo-lite",
     img  : "https://cdn.shopify.com/s/files/1/0129/7698/0032/files/diablo-full.png?v=1609435306",
     desc : "Distorsion made to enhance your drums and 808’s so they hit harder and cut through your mix.",
+    type : "effect",
   },
 
   {
@@ -585,6 +743,7 @@ const PLUGINS = [
     url  : "https://polyversemusic.com/products/filtron/",
     img  : "https://static.kvraudio.com/i/b/filtron-screenshot-hq.jpg",
     desc : "Basic filter, sounds really good. You can automate it.",
+    type : "effect",
   },
 
   {
@@ -592,6 +751,7 @@ const PLUGINS = [
     url  : "https://polyversemusic.com/products/wider/",
     img  : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRv60aj9N9WeHHPlSVXkq5ydAoMnTC0tx0OTw&s",
     desc : "Simple strereo widener. Fast, effective.",
+    type : "effect",
   },
 
 
@@ -600,6 +760,7 @@ const PLUGINS = [
     url  : "https://www.andrewreeman.com/spectralsuite/",
     img  : "https://www.audiopluginsforfree.com/wp-content/uploads/2023/09/andrew-reeman-spectral-suite-2.png",
     desc : "Must have suite for sound design and modulation. Phase Lock, Frequency Magnet, Sinusoidal Shaped Filter, and more... (7 plugins)",
+    type : "effect",
   },
 
   {
@@ -607,6 +768,8 @@ const PLUGINS = [
     url  : "https://slatedigital.com/fresh-air-2/",
     img  : "https://assets.st-note.com/production/uploads/images/227284758/rectangle_large_type_2_6045c2bf2dfb3b7759a8767792d1b5d0.png?width=1280",
     desc : "Fresh Air is a dynamic high frequency processor that breathes new life into your mix with just two knobs. Good for vocals especially",
+    type : "effect",
+    isstarred : 1, 
   },
 
   {
@@ -614,6 +777,7 @@ const PLUGINS = [
     url  : "https://slatedigital.com/heatwave/",
     img  : "https://slatedigital.com/wp-content/uploads/2025/07/New-Logo-Heatwave-Gui.png",
     desc : "Distorsion for instant attitude. grit, saturation, or warmth, it is simple but gold.",
+    type : "effect",
   },
 
   {
@@ -621,6 +785,7 @@ const PLUGINS = [
     url  : "https://gvst.uk/Downloads/GClip",
     img  : "https://gvst.uk/img/gclip_ui.png",
     desc : "Limiters are smart. Gclip is dumb, it simply cuts your audio, clips it like a good boy.",
+    type : "effect",
   },
 
   {
@@ -628,6 +793,7 @@ const PLUGINS = [
     url  : "https://www.auburnsounds.com/products/Graillon.html",
     img  : "https://www.auburnsounds.com/images/graillon3.jpg",
     desc : "Pitch correction, formant shift, one of the best free autotune out there.",
+    type : "effect",
   },
 
   {
@@ -635,6 +801,8 @@ const PLUGINS = [
     url  : "https://www.auburnsounds.com/blog/Introducing-Selene.html",
     img  : "https://www.auburnsounds.com/images/selene.jpg",
     desc : "Alright. So this is one of my favourite reverb of all time. Smooth, spacy, ready to use...",
+    type : "effect",
+    isstarred : 1, 
   },
 
   {
@@ -642,6 +810,7 @@ const PLUGINS = [
     url  : "https://www.igorski.nl/plugins/transformant",
     img  : "https://www.igorski.nl/data/modules/download/6/preview.jpg?1710958538",
     desc : "Its kind of enigmatic. Transformant provides a multichannel formant filter effect that is tailored to provide gritty, honking, nasal grunts rather than pristine angelic choirs. Thanks to Igorski",
+    type : "effect",
   },
 
   {
@@ -649,6 +818,7 @@ const PLUGINS = [
     url  : "https://www.igorski.nl/plugins/regrader",
     img  : "https://www.igorski.nl/data/modules/download/3/preview.jpg?1710958538",
     desc : "Regrader provides a delay effect in which the repeats degrade in various ways to provide a malevolent twist on the ears. Thanks to Igorski",
+    type : "effect",
   },
 
   {
@@ -656,6 +826,7 @@ const PLUGINS = [
     url  : "https://www.igorski.nl/plugins/darvaza",
     img  : "https://www.igorski.nl/data/modules/download/8/preview.jpg?1710958538",
     desc : "Very interesting gate effect. Definitely try messing with it. Igorski never disappoints.",
+    type : "effect",
   },
 
   {
@@ -663,6 +834,8 @@ const PLUGINS = [
     url  : "https://www.igorski.nl/plugins/homecorrupter",
     img  : "https://bedroomproducersblog.com/wp-content/uploads/2021/03/homecorrupter.jpg",
     desc : "It is insane. If you need a functionnal bitcrush effect, with a lot of parameters, here it is. Love it. Thanks to Igorski.",
+    type : "effect",
+    isstarred : 1, 
   },
 
   {
@@ -678,12 +851,15 @@ const PLUGINS = [
     url  : "https://kilohearts.com/products/kilohearts_essentials",
     img  : "https://img.audiofanzine.com/images/u/product/normal/kilohearts-khs-one-121904.jpg",
     desc : "If you need ONE suite, its the Khs suite. 30 quality plugins, free, simple, effective. A must have !",
+    type : "effect",
+    isstarred : 1, 
   },
 
   {
     name : "OTT",
     url  : "https://xferrecords.com/freeware",
     img  : "https://songmixmaster.com/wp-content/uploads/2024/06/Xfer-OTT-Free-Multiband-Compressor-VST-Plugin.jpg",
+    type : "effect",
     desc : "The legendary OTT, now free, with its unique sound. ",
   },
 
@@ -692,6 +868,7 @@ const PLUGINS = [
     url  : "https://surge-synthesizer.github.io/",
     img  : "https://surge-synthesizer.github.io/images/manual-xt/Pictures/surge_dark.png",
     desc : "Synth. The most powerful free synth on the market. Even Serum 2 is scared of SurgeXT. Achieve unique sounds, with a lot of presets.",
+    isstarred : 1, 
   },
 
   {
@@ -706,6 +883,7 @@ const PLUGINS = [
     url  : "https://vital.audio/",
     img  : "https://www.audiopluginsforfree.com/wp-content/uploads/2020/11/captura-de-pantalla-2020-11-27-a-las-95952.jpg",
     desc : "Synth. Serum 2 alternative. As good. Active community. It is a Spectral warping wavetable synth. If you need one, it's VITAL. gooo !!!",
+    isstarred : 1, 
   },
 
   {
@@ -831,15 +1009,43 @@ const PLUGINS = [
 
 ];
 
-/* ── Rendu (ne pas modifier) ── */
+/* ================================================================
+   Rendu — ne pas modifier
+   ================================================================ */
+
+let activeFilter = 'all';
+let searchQuery  = '';
+
 function card(p, i) {
-  const img = p.img
-    ? `<img src="${p.img}" alt="${p.name}" loading="lazy" onerror="this.parentElement.innerHTML='<span class=\\'placeholder\\'>no preview</span>'">`
+  const typeBadge = p.type
+    ? `<span class="type-badge ${p.type}">${p.type}</span>` : '';
+
+  const starBadge = p.isstarred ? `<span class="star-badge">★</span>` : '';
+
+  const imgContent = p.img
+    ? `<img src="${p.img}" alt="${p.name}" loading="lazy"
+         onerror="this.parentElement.querySelector('.zoom-hint') && (this.style.display='none'); this.insertAdjacentHTML('afterend','<span class=\\'placeholder\\'>no preview</span>')">`
     : `<span class="placeholder">no preview</span>`;
+
+  const zoomHint = p.img ? `
+    <div class="zoom-hint">
+      <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+        <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+        <line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/>
+      </svg>
+    </div>` : '';
+
   const desc = p.desc ? `<p class="card-desc">${p.desc}</p>` : '';
+  const clickAttr = p.img ? `onclick="openLb('${p.img.replace(/'/g,"\\'")}','${p.name.replace(/'/g,"\\'")}')"`  : '';
+
   return `
-  <div class="card" style="animation-delay:${i*50}ms">
-    <div class="card-img">${img}</div>
+  <div class="card" style="animation-delay:${i*45}ms">
+    <div class="card-img" ${clickAttr}>
+      ${imgContent}
+      ${typeBadge}
+      ${starBadge}
+      ${zoomHint}
+    </div>
     <div class="card-body">
       <div class="card-name">${p.name}</div>
       ${desc}
@@ -858,17 +1064,51 @@ function card(p, i) {
   </div>`;
 }
 
-function render(q) {
-  const list = q
-    ? PLUGINS.filter(p => p.name.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q))
-    : PLUGINS;
+function render() {
+  const list = PLUGINS.filter(p => {
+    const fOk = activeFilter === 'all' || activeFilter === 'starred'
+      ? (activeFilter === 'starred' ? p.isstarred === 1 : true)
+      : p.type === activeFilter;
+    const qOk = !searchQuery || p.name.toLowerCase().includes(searchQuery) || (p.desc||'').toLowerCase().includes(searchQuery);
+    return fOk && qOk;
+  });
   document.getElementById('grid').innerHTML = list.length
     ? list.map((p,i) => card(p,i)).join('')
     : '<div class="empty">Aucun plugin trouvé.</div>';
 }
 
-document.getElementById('search').addEventListener('input', e => render(e.target.value.toLowerCase().trim()));
-render('');
+/* ── Filters ── */
+document.querySelectorAll('.f-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    activeFilter = btn.dataset.f;
+    document.querySelectorAll('.f-btn').forEach(b => b.className = 'f-btn');
+    btn.classList.add(activeFilter === 'starred' ? 'active-starred' : 'active-' + activeFilter);
+    render();
+  });
+});
+
+document.getElementById('search').addEventListener('input', e => {
+  searchQuery = e.target.value.toLowerCase().trim();
+  render();
+});
+
+/* ── Lightbox ── */
+function openLb(src, alt) {
+  const lb = document.getElementById('lightbox');
+  const img = document.getElementById('lb-img');
+  img.src = src; img.alt = alt;
+  lb.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeLb() {
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.getElementById('lb-close').addEventListener('click', closeLb);
+document.getElementById('lightbox').addEventListener('click', e => { if (e.target === e.currentTarget) closeLb(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLb(); });
+
+render();
 </script>
 </body>
 </html>
