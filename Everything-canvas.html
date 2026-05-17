@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Carte avec MiniMap</title>
+
+<style>
+body {
+    margin: 0;
+    overflow: hidden;
+    background: #111;
+    cursor: grab; 
+}
+
+body:active {
+    cursor: grabbing;
+}
+
+#viewport {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    position: relative;
+}
+
+#map {
+    position: absolute;
+    width: 10000px;
+    height: 10000px;
+    transform-origin: 0 0;
+    will-change: transform;
+}
+
+.tile {
+    position: absolute;
+    width: 5000px;
+    height: 5000px;
+    user-select: none;
+    pointer-events: none;
+}
+
+/* -------- MINIMAP -------- */
+
+#minimap {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    width: 200px;
+    height: 200px;
+    background: #000;
+    border: 2px solid white;
+    overflow: hidden;
+}
+
+#minimapContent {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+}
+
+.minimapTile {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    opacity: 0.8;
+}
+
+#viewRect {
+    position: absolute;
+    border: 2px solid red;
+    pointer-events: none;
+}
+</style>
+</head>
+
+<body>
+
+<div id="viewport">
+    <div id="map">
+        <img src="5000x5000 (1).png" class="tile" style="top:0; left:0;">
+        <img src="5000x5000 (2).png" class="tile" style="top:0; left:5000px;">
+        <img src="5000x5000 (3).png" class="tile" style="top:5000px; left:0;">
+        <img src="5000x5000 (4).png" class="tile" style="top:5000px; left:5000px;">
+    </div>
+
+    <!-- MiniMap -->
+    <div id="minimap">
+        <div id="minimapContent">
+            <img src="5000x5000 (1).png" class="minimapTile" style="top:0; left:0;">
+            <img src="5000x5000 (2).png" class="minimapTile" style="top:0; left:100px;">
+            <img src="5000x5000 (3).png" class="minimapTile" style="top:100px; left:0;">
+            <img src="5000x5000 (4).png" class="minimapTile" style="top:100px; left:100px;">
+        </div>
+        <div id="viewRect"></div>
+    </div>
+</div>
+
+<script>
+const map = document.getElementById("map");
+const viewport = document.getElementById("viewport");
+const viewRect = document.getElementById("viewRect");
+
+let offsetX = 0;
+let offsetY = 0;
+let scale = 0.5;
+
+let velocityX = 0;
+let velocityY = 0;
+
+const friction = 0.95;
+const minVelocity = 0.1;
+
+const minScale = 0.2;
+const maxScale = 3;
+
+const mapSize = 10000;
+const minimapSize = 200;
+
+let pointers = new Map();
+let lastDistance = null;
+
+function clamp(value, min, max) {
+    return Math.max(min, Math.min(max, value));
+}
+
+function updateTransform() {
+
+    const scaledWidth = mapSize * scale;
+    const scaledHeight = mapSize * scale;
+
+    const minX = viewport.clientWidth - scaledWidth;
+    const minY = viewport.clientHeight - scaledHeight;
+
+    offsetX = clamp(offsetX, Math.min(0, minX), 0);
+    offsetY = clamp(offsetY, Math.min(0, minY), 0);
+
+    map.style.transform =
+        `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
+
+    updateMiniMap();
+}
+
+function updateMiniMap() {
+    const visibleWidth = viewport.clientWidth / scale;
+    const visibleHeight = viewport.clientHeight / scale;
+
+    const worldX = -offsetX / scale;
+    const worldY = -offsetY / scale;
+
+    const ratio = minimapSize / mapSize;
+
+    viewRect.style.width = visibleWidth * ratio + "px";
+    viewRect.style.height = visibleHeight * ratio + "px";
+    viewRect.style.left = worldX * ratio + "px";
+    viewRect.style.top = worldY * ratio + "px";
+}
+
+function animateInertia() {
+    if (Math.abs(velocityX) < minVelocity &&
+        Math.abs(velocityY) < minVelocity) {
+        velocityX = 0;
+        velocityY = 0;
+        return;
+    }
+
+    offsetX += velocityX;
+    offsetY += velocityY;
+
+    velocityX *= friction;
+    velocityY *= friction;
+
+    updateTransform();
+    requestAnimationFrame(animateInertia);
+}
+
+/* ===== POINTER EVENTS ===== */
+
+viewport.addEventListener("pointerdown", e => {
+    viewport.setPointerCapture(e.pointerId);
+    pointers.set(e.pointerId, e);
+});
+
+viewport.addEventListener("pointermove", e => {
+    if (!pointers.has(e.pointerId)) return;
+
+    pointers.set(e.pointerId, e);
+
+    if (pointers.size === 1) {
+        // DRAG
+        const pointer = Array.from(pointers.values())[0];
+
+        velocityX = e.movementX;
+        velocityY = e.movementY;
+
+        offsetX += velocityX;
+        offsetY += velocityY;
+
+        updateTransform();
+    }
+
+    if (pointers.size === 2) {
+        // PINCH ZOOM
+        const pts = Array.from(pointers.values());
+        const dx = pts[0].clientX - pts[1].clientX;
+        const dy = pts[0].clientY - pts[1].clientY;
+        const distance = Math.hypot(dx, dy);
+
+        if (lastDistance) {
+            const zoomFactor = distance / lastDistance;
+            const newScale = clamp(scale * zoomFactor, minScale, maxScale);
+
+            const rect = viewport.getBoundingClientRect();
+            const centerX = (pts[0].clientX + pts[1].clientX) / 2 - rect.left;
+            const centerY = (pts[0].clientY + pts[1].clientY) / 2 - rect.top;
+
+            const worldX = (centerX - offsetX) / scale;
+            const worldY = (centerY - offsetY) / scale;
+
+            scale = newScale;
+
+            offsetX = centerX - worldX * scale;
+            offsetY = centerY - worldY * scale;
+
+            updateTransform();
+        }
+
+        lastDistance = distance;
+    }
+
+});
+
+viewport.addEventListener("pointerup", e => {
+    pointers.delete(e.pointerId);
+    lastDistance = null;
+
+    if (pointers.size === 0) {
+        requestAnimationFrame(animateInertia);
+    }
+});
+
+viewport.addEventListener("pointercancel", e => {
+    pointers.delete(e.pointerId);
+});
+
+/* ===== MOUSE WHEEL ZOOM ===== */
+
+document.addEventListener("wheel", (e) => {
+    e.preventDefault();
+
+    const zoomSpeed = 0.0015;
+    const delta = -e.deltaY * zoomSpeed;
+    const newScale = clamp(scale + delta, minScale, maxScale);
+
+    const rect = viewport.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+
+    const worldX = (mouseX - offsetX) / scale;
+    const worldY = (mouseY - offsetY) / scale;
+
+    scale = newScale;
+
+    offsetX = mouseX - worldX * scale;
+    offsetY = mouseY - worldY * scale;
+
+    updateTransform();
+
+}, { passive: false });
+
+/* ===== INIT ===== */
+
+window.addEventListener("load", () => {
+    const scaledWidth = mapSize * scale;
+    const scaledHeight = mapSize * scale;
+
+    offsetX = (viewport.clientWidth - scaledWidth) / 2;
+    offsetY = (viewport.clientHeight - scaledHeight) / 2;
+
+    updateTransform();
+});
+</script>
