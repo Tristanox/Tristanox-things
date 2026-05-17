@@ -130,9 +130,7 @@
     /* ══ MAIN ══ */
     main {
       position: relative; z-index: 1;
-      max-width: 1120px;
-      margin: 0 auto;
-      padding: 0 28px 100px;
+      padding: 0 16px 100px;
     }
 
     .section-label {
@@ -152,18 +150,15 @@
       background: var(--border);
     }
 
-    /* Responsive grid */
+    /* Grid — toujours 3 colonnes, toute la largeur */
     .grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 18px;
-    }
-    @media (max-width: 860px) {
-      .grid { grid-template-columns: repeat(2, 1fr); }
+      gap: 14px;
     }
     @media (max-width: 540px) {
-      .grid { grid-template-columns: 1fr; gap: 14px; }
-      main { padding: 0 14px 80px; }
+      .grid { gap: 10px; }
+      main { padding: 0 8px 80px; }
       header { padding: 52px 16px 40px; }
     }
 
