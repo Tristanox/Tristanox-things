@@ -1,0 +1,1509 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Calculateur de moyenne</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.0.0/dist/tabler-icons.min.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0c12;
+  --chrome:#131620;
+  --tab-bg:#0e1018;
+  --tab-act:#0a0c12;
+  --p1:#111420;
+  --p2:#161929;
+  --p3:#1c2035;
+  --bd:#1e2236;
+  --bd2:#2a3050;
+  --tx:#cdd5f0;
+  --tx2:#8b93b8;
+  --mu:#4a5070;
+  --ac:#6272f5;
+  --ac2:#4f5ee0;
+  --ok:#22d3a0;
+  --wa:#f5a623;
+  --er:#f05252;
+  --in:#5aadee;
+  --pu:#a78bfa;
+  --r:8px;--rs:5px;
+  --font:'Inter',system-ui,sans-serif;
+  --mono:'JetBrains Mono',monospace;
+  --shadow:0 2px 12px rgba(0,0,0,.4);
+}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--tx);font-family:var(--font);font-size:13px;-webkit-font-smoothing:antialiased}
+
+/* ════ CHROME BAR ════════════════════════════════════ */
+#chrome-bar{
+  height:46px;background:var(--chrome);
+  display:flex;align-items:flex-end;
+  padding:0 10px 0 12px;
+  border-bottom:1px solid rgba(0,0,0,.6);
+  position:relative;z-index:100;gap:2px;flex-shrink:0;
+}
+.chrome-tab{
+  display:flex;align-items:center;gap:7px;
+  padding:0 14px 0 12px;height:34px;
+  min-width:175px;max-width:240px;
+  background:var(--tab-bg);
+  border-radius:8px 8px 0 0;
+  border:1px solid transparent;border-bottom:none;
+  cursor:pointer;position:relative;transition:background .12s;
+  font-size:12px;font-weight:500;color:var(--mu);
+  flex-shrink:0;user-select:none;
+}
+.chrome-tab:hover:not(.active){background:#141721;color:var(--tx2)}
+.chrome-tab.active{background:var(--tab-act);border-color:var(--bd);color:var(--tx);z-index:2}
+.chrome-tab.active::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;background:var(--tab-act)}
+.tab-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.tab-avg{margin-left:auto;font-size:11px;font-family:var(--mono);color:var(--mu)}
+.chrome-tab.active .tab-avg{color:var(--tx2)}
+.tab-close{background:none;border:none;color:var(--mu);cursor:pointer;padding:2px;border-radius:3px;display:flex;align-items:center;font-size:12px;margin-left:3px;flex-shrink:0;transition:color .12s,background .12s}
+.tab-close:hover{color:var(--er);background:rgba(240,82,82,.15)}
+.tab-sep{width:1px;height:18px;background:var(--bd);margin:0 6px;align-self:center;flex-shrink:0}
+#new-tab-btn{height:26px;width:26px;margin-bottom:3px;background:none;border:none;color:var(--mu);cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:color .12s,background .12s;font-size:15px;flex-shrink:0}
+#new-tab-btn:hover{color:var(--tx);background:var(--p3)}
+#chrome-right{margin-left:auto;display:flex;align-items:center;gap:5px;padding-bottom:4px;flex-shrink:0}
+.crbtn{height:26px;padding:0 9px;background:none;border:1px solid var(--bd);border-radius:6px;color:var(--mu);cursor:pointer;font-size:11.5px;font-family:var(--font);display:flex;align-items:center;gap:4px;transition:all .12s;white-space:nowrap}
+.crbtn:hover{color:var(--tx);border-color:var(--bd2);background:var(--p2)}
+.crbtn.ok{border-color:rgba(34,211,160,.3);color:var(--ok)}
+.crbtn.ok:hover{background:rgba(34,211,160,.08)}
+#ctog-wrap{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--tx2);padding:0 2px}
+
+/* ════ LAYOUT ════════════════════════════════════════ */
+#layout{display:flex;height:calc(100vh - 46px);overflow:hidden}
+
+/* ════ LEFT PANEL ════════════════════════════════════ */
+#left{width:272px;min-width:240px;background:var(--p1);border-right:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
+.lhdr{padding:14px 16px 12px;border-bottom:1px solid var(--bd);flex-shrink:0}
+.lhdr-title{font-size:13px;font-weight:600;letter-spacing:-.02em;color:var(--tx)}
+.lhdr-sub{font-size:11px;color:var(--mu);margin-top:2px}
+
+/* avg hero */
+#avg-hero{padding:14px 16px;border-bottom:1px solid var(--bd);flex-shrink:0}
+#avg-period-lbl{font-size:10px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px}
+#avg-main-row{display:flex;align-items:baseline;gap:5px}
+#mval{font-size:44px;font-weight:700;letter-spacing:-3px;font-family:var(--mono);color:var(--mu);transition:color .25s}
+#mval-d{font-size:14px;color:var(--mu)}
+#mtag{font-size:10.5px;font-weight:600;padding:3px 9px;border-radius:20px;margin-left:5px;transition:all .2s}
+#mmeta{font-size:11px;color:var(--mu);margin-top:4px;display:flex;gap:10px;flex-wrap:wrap}
+.mmeta-item{display:flex;align-items:center;gap:3px}
+#vs-class-pill{display:none;margin-top:6px;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;font-family:var(--mono);width:fit-content}
+
+/* mini stats */
+#stat-mini{padding:10px 16px;flex-shrink:0}
+.sm3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px}
+.smc{background:var(--p2);border:1px solid var(--bd);border-radius:var(--rs);padding:6px 8px}
+.smc-l{font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
+.smc-v{font-size:13px;font-weight:600;font-family:var(--mono)}
+
+/* left scroll */
+#left-scroll{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+.lsec{padding:10px 16px;border-top:1px solid var(--bd)}
+.lsec-lbl{font-size:9.5px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.07em;margin-bottom:7px}
+
+/* periods overview */
+.pov-row{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;margin-bottom:3px;background:var(--p2);border:1px solid var(--bd);border-radius:var(--rs);cursor:pointer;transition:border-color .12s}
+.pov-row:hover{border-color:var(--bd2)}
+.pov-row.active-pov{border-color:var(--ac);background:var(--p3)}
+.pov-avg{font-size:16px;font-weight:700;font-family:var(--mono)}
+#gen-avg-row{display:none;margin-top:4px;padding:7px 10px;background:var(--p3);border:1px solid var(--bd2);border-radius:var(--rs);justify-content:space-between;align-items:center}
+#gen-avg-val{font-size:18px;font-weight:700;font-family:var(--mono)}
+
+/* quick input */
+.qrow{display:flex;gap:5px}
+.qinput{flex:1;padding:7px 10px;background:var(--p2);border:1.5px solid var(--bd);border-radius:var(--rs);color:var(--tx);font-size:12.5px;font-family:var(--font);outline:none;transition:border-color .15s}
+.qinput:focus{border-color:var(--ac)}
+.qinput::placeholder{color:var(--mu);font-size:12px}
+.qhint{font-size:10px;color:var(--mu);margin-top:4px;line-height:1.5}
+kbd{background:var(--p3);border:1px solid var(--bd2);padding:1px 5px;border-radius:3px;font-size:9.5px}
+#io-msg{font-size:11.5px;margin-top:4px;display:none}
+
+/* chips */
+.chips-wrap{display:flex;flex-wrap:wrap;gap:4px}
+.chip{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:none;transition:opacity .12s,transform .1s;white-space:nowrap}
+.chip:hover{opacity:.8}.chip:active{transform:scale(.95)}
+
+/* left bottom */
+#left-bot{padding:10px 16px;border-top:1px solid var(--bd);flex-shrink:0}
+.mode-row{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}
+.mbtn{padding:4px 9px;font-size:11px;font-family:var(--font);background:var(--p2);border:1px solid var(--bd);border-radius:var(--rs);color:var(--tx2);cursor:pointer;transition:all .12s;font-weight:500}
+.mbtn:hover{color:var(--tx);border-color:var(--bd2)}
+
+/* ════ RIGHT AREA ════════════════════════════════════ */
+#right{flex:1;overflow:hidden;display:flex;flex-direction:column}
+.view{flex:1;overflow-y:auto;padding:20px 22px;display:flex;flex-direction:column;gap:16px}
+.view.hidden{display:none}
+
+/* ════ SUBJECT TABLE ════════════════════════════════= */
+#subj-panel{background:var(--p1);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;flex-shrink:0}
+.subj-hdr{padding:9px 14px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:8px}
+.subj-hdr-title{font-size:12.5px;font-weight:600;flex:1}
+#count-badge{background:var(--p3);border-radius:20px;padding:1px 7px;font-size:10.5px;color:var(--tx2)}
+#drag-hint{font-size:10.5px;color:var(--mu)}
+#col-h{padding:4px 14px;background:var(--p2);display:none}
+.srow{display:grid;gap:6px;align-items:center;padding:5px 14px;border-bottom:1px solid var(--bd);transition:background .1s;cursor:grab;user-select:none}
+.srow:last-child{border-bottom:none}
+.srow:hover{background:var(--p2)}
+.srow.dragging{opacity:.3;cursor:grabbing}
+.srow.dragover{background:var(--p3);outline:1.5px solid var(--ac);outline-offset:-1px}
+#empty{text-align:center;color:var(--mu);font-size:12.5px;padding:2.2rem 0}
+.drag-h{color:var(--mu);display:flex;align-items:center;font-size:13px}
+.del{background:none;border:none;color:var(--mu);cursor:pointer;padding:2px;border-radius:4px;width:22px;height:22px;display:flex;align-items:center;justify-content:center;transition:color .12s,background .12s}
+.del:hover{color:var(--er);background:rgba(240,82,82,.1)}
+input[type=text],input[type=number]{background:var(--p2);border:1px solid transparent;border-radius:4px;color:var(--tx);font-size:12.5px;font-family:var(--font);padding:4px 7px;outline:none;width:100%;transition:border-color .15s,background .15s}
+input[type=text]:hover,input[type=number]:hover{border-color:var(--bd)}
+input[type=text]:focus,input[type=number]:focus{border-color:var(--ac);background:var(--p3)}
+input::placeholder{color:var(--mu)}
+input[type=number]{text-align:center}
+.class-inp{color:var(--in) !important}
+.class-inp::placeholder{color:var(--mu) !important}
+
+/* ════ STATS GRID ════════════════════════════════════ */
+.r-title{font-size:10px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.08em;margin-bottom:9px}
+#full-sg{display:grid;grid-template-columns:repeat(auto-fill,minmax(138px,1fr));gap:7px}
+.sc{background:var(--p1);border:1px solid var(--bd);border-radius:var(--rs);padding:10px 12px}
+.sc-l{font-size:9.5px;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.sc-v{font-size:17px;font-weight:600;font-family:var(--mono)}
+
+/* charts 2 col */
+#charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.chart-card{background:var(--p1);border:1px solid var(--bd);border-radius:var(--r);padding:14px 16px}
+.bar-bg{flex:1;background:var(--p2);border-radius:3px;height:6px;overflow:hidden;position:relative}
+.bar-fill{height:100%;border-radius:3px;transition:width .4s}
+.histo-wrap{display:flex;align-items:flex-end;gap:3px;height:66px;margin-bottom:7px}
+.hcol{flex:1;border-radius:3px 3px 0 0;min-height:2px;transition:height .4s;position:relative}
+.hlabel{display:flex;gap:3px;font-size:9px;color:var(--mu)}
+.hlabel span{flex:1;text-align:center}
+
+/* ════ ADVANCED STATS ════════════════════════════════ */
+#adv-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.adv-card{background:var(--p1);border:1px solid var(--bd);border-radius:var(--r);padding:18px 20px;display:flex;flex-direction:column;min-height:320px}
+.adv-card.full{grid-column:1/-1;min-height:unset}
+.adv-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px}
+.adv-title{font-size:13px;font-weight:600;display:flex;align-items:center;gap:7px}
+.adv-sub{font-size:11px;color:var(--mu);margin-bottom:14px;line-height:1.5}
+.no-data{color:var(--mu);font-size:12px;display:flex;align-items:center;justify-content:center;flex:1;text-align:center;padding:1.5rem}
+canvas{display:block;max-width:100%}
+
+/* class diff list */
+.diff-list{display:flex;flex-direction:column;gap:5px;overflow-y:auto;flex:1}
+.diff-row{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:7px 10px;background:var(--p2);border:1px solid var(--bd);border-radius:var(--rs)}
+.diff-row.above{border-left:3px solid var(--ok)}
+.diff-row.below{border-left:3px solid var(--er)}
+.diff-row.neutral{border-left:3px solid var(--bd2)}
+.diff-name{font-size:12px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.diff-grades{font-size:11px;color:var(--tx2);font-family:var(--mono);text-align:right}
+.diff-delta{font-size:13px;font-weight:700;font-family:var(--mono);text-align:right;min-width:44px}
+
+/* evo subject table */
+.evo-hdr-row{display:grid;gap:8px;padding:0 0 6px;border-bottom:1px solid var(--bd);margin-bottom:6px}
+.evo-row{display:grid;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid rgba(30,34,54,.8)}
+.evo-row:last-child{border-bottom:none}
+
+/* ════ TOGGLE ════════════════════════════════════════ */
+.tog{position:relative;display:inline-block;width:34px;height:18px;flex-shrink:0}
+.tog input{opacity:0;width:0;height:0}
+.tsl{position:absolute;inset:0;background:var(--p3);border-radius:18px;cursor:pointer;transition:.18s;border:1px solid var(--bd)}
+.tsl::before{content:'';position:absolute;width:12px;height:12px;left:2px;top:2px;background:var(--mu);border-radius:50%;transition:.18s}
+.tog input:checked+.tsl{background:var(--ac2);border-color:var(--ac)}
+.tog input:checked+.tsl::before{transform:translateX(16px);background:#fff}
+
+/* ════ BUTTONS ═══════════════════════════════════════ */
+.btn{border:none;border-radius:var(--rs);padding:6px 11px;font-size:12px;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:opacity .12s,transform .08s;white-space:nowrap;font-family:var(--font)}
+.btn:active{transform:scale(.97)}
+.btn-p{background:var(--ac2);color:#fff}.btn-p:hover{background:var(--ac)}
+.btn-g{background:var(--p2);border:1px solid var(--bd);color:var(--tx)}.btn-g:hover{border-color:var(--bd2);background:var(--p3)}
+.btn-d{background:transparent;border:1px solid var(--bd);color:var(--er)}.btn-d:hover{border-color:var(--er);background:rgba(240,82,82,.07)}
+
+/* ════ SCROLLBAR ═════════════════════════════════════ */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:3px}
+
+/* period filter pill buttons */
+.pfbtn{padding:4px 10px;font-size:11px;font-family:var(--font);background:var(--p2);border:1px solid var(--bd);border-radius:20px;color:var(--tx2);cursor:pointer;transition:all .12s;font-weight:500}
+.pfbtn:hover{border-color:var(--bd2);color:var(--tx)}
+.pfbtn.sel{color:var(--tx)}
+</style>
+</head>
+<body>
+
+<!-- ════ CHROME BAR ════════════════════════════════ -->
+<div id="chrome-bar">
+  <div id="app-tabs" style="display:flex;align-items:flex-end;gap:2px">
+    <div class="chrome-tab active" id="app-tab-main" onclick="switchAppTab('main')">
+      <i class="ti ti-calculator" style="font-size:13px;color:var(--ac)"></i>
+      <span>Calculateur</span>
+    </div>
+    <div class="chrome-tab" id="app-tab-stats" onclick="switchAppTab('stats')">
+      <i class="ti ti-chart-radar" style="font-size:13px;color:var(--pu)"></i>
+      <span>Statistiques avancées</span>
+    </div>
+  </div>
+  <div class="tab-sep"></div>
+  <div id="period-tabs" style="display:flex;align-items:flex-end;gap:2px;overflow-x:auto;max-width:480px"></div>
+  <button id="new-tab-btn" title="Nouvelle période" onclick="addCustomPeriod()"><i class="ti ti-plus"></i></button>
+  <div id="chrome-right">
+    <div id="ctog-wrap">
+      Coefficients
+      <label class="tog"><input type="checkbox" id="ctog" checked><span class="tsl"></span></label>
+    </div>
+    <button class="crbtn ok" onclick="printBulletin()"><i class="ti ti-file-text"></i>PDF</button>
+    <button class="crbtn" onclick="exportJSON()"><i class="ti ti-download"></i>JSON</button>
+    <button class="crbtn" onclick="exportCSV()"><i class="ti ti-table"></i>CSV</button>
+    <button class="crbtn" onclick="document.getElementById('fimp').click()"><i class="ti ti-upload"></i>Importer</button>
+    <input type="file" id="fimp" accept=".json" style="display:none" onchange="importData(event)">
+  </div>
+</div>
+
+<!-- ════ LAYOUT ════════════════════════════════════ -->
+<div id="layout">
+
+  <!-- LEFT PANEL -->
+  <div id="left">
+    <div class="lhdr">
+      <div class="lhdr-title">Calculateur de moyenne</div>
+      <div class="lhdr-sub">Dashboard · glisser-déposer · périodes</div>
+    </div>
+
+    <!-- avg hero -->
+    <div id="avg-hero">
+      <div id="avg-period-lbl">Moyenne —</div>
+      <div id="avg-main-row">
+        <span id="mval">—</span>
+        <span id="mval-d">/20</span>
+        <span id="mtag"></span>
+      </div>
+      <div id="mmeta"></div>
+      <div id="vs-class-pill"></div>
+    </div>
+
+    <div id="stat-mini"><div class="sm3" id="sm3"></div></div>
+
+    <div id="left-scroll">
+      <!-- periods overview -->
+      <div id="pov-sec" class="lsec" style="display:none">
+        <div class="lsec-lbl">Toutes les périodes</div>
+        <div id="pov-rows"></div>
+        <div id="gen-avg-row">
+          <span style="font-size:11px;color:var(--mu)">Moyenne générale</span>
+          <span id="gen-avg-val"></span>
+        </div>
+      </div>
+
+      <!-- quick add -->
+      <div class="lsec">
+        <div class="lsec-lbl">Saisie rapide</div>
+        <div class="qrow">
+          <input class="qinput" id="qinp" placeholder="14,5 · 16/2 Physique · 8 Maths 3…" autocomplete="off">
+          <button class="btn btn-p" onclick="parseQuick()"><i class="ti ti-plus"></i></button>
+        </div>
+        <div class="qhint"><kbd>↵</kbd> · <em>note</em> · <em>note/coeff Matière</em></div>
+        <div id="io-msg"></div>
+      </div>
+
+      <!-- chips -->
+      <div class="lsec">
+        <div class="lsec-lbl">Matières rapides</div>
+        <div class="chips-wrap" id="chips"></div>
+      </div>
+    </div>
+
+    <div id="left-bot">
+      <div class="lsec-lbl">Mode de période</div>
+      <div class="mode-row">
+        <button class="mbtn" onclick="setPeriodMode('trimestre')">T1 · T2 · T3</button>
+        <button class="mbtn" onclick="setPeriodMode('semestre')">S1 · S2</button>
+        <button class="mbtn" onclick="addCustomPeriod()"><i class="ti ti-plus" style="font-size:10px"></i> Période</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT AREA -->
+  <div id="right">
+
+    <!-- ── CALCULATEUR VIEW ── -->
+    <div class="view" id="view-main">
+
+      <div id="subj-panel">
+        <div class="subj-hdr">
+          <div class="subj-hdr-title">Matières <span id="count-badge">0</span></div>
+          <span id="drag-hint"></span>
+          <button class="btn btn-d" onclick="clearAll()" style="margin-left:auto;font-size:11px;padding:4px 8px"><i class="ti ti-trash"></i>Effacer</button>
+        </div>
+        <div id="col-h"></div>
+        <div id="slist"></div>
+        <div id="empty">Aucune matière — utilisez la saisie rapide ou les chips</div>
+      </div>
+
+      <div>
+        <div class="r-title">Statistiques détaillées</div>
+        <div id="full-sg"></div>
+      </div>
+
+      <div id="charts-grid">
+        <div class="chart-card" id="bars-card" style="display:none">
+          <div class="r-title">Notes par matière <span id="bars-class-legend" style="margin-left:6px;font-size:9.5px;color:var(--in)">· trait = moy. classe</span></div>
+          <div id="bars"></div>
+        </div>
+        <div class="chart-card" id="histo-card" style="display:none">
+          <div class="r-title">Distribution des notes</div>
+          <div class="histo-wrap" id="histo"></div>
+          <div class="hlabel" id="hlabel"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── STATS AVANCÉES VIEW ── -->
+    <div class="view hidden" id="view-stats">
+      <div id="adv-grid">
+
+        <!-- Radar -->
+        <div class="adv-card">
+          <div class="adv-hdr">
+            <div class="adv-title"><i class="ti ti-chart-radar" style="color:var(--pu)"></i>Profil radar</div>
+          </div>
+          <div class="adv-sub">Performance relative par matière — période active</div>
+          <div style="flex:1;display:flex;align-items:center;justify-content:center;position:relative">
+            <canvas id="radar-canvas" width="320" height="280"></canvas>
+            <div id="radar-nd" class="no-data" style="position:absolute">Ajoutez ≥ 3 notes pour voir le radar</div>
+          </div>
+        </div>
+
+        <!-- Avg evolution line -->
+        <div class="adv-card">
+          <div class="adv-hdr">
+            <div class="adv-title"><i class="ti ti-trending-up" style="color:var(--ok)"></i>Évolution des moyennes</div>
+          </div>
+          <div class="adv-sub">Progression de la moyenne générale période par période</div>
+          <div style="flex:1;position:relative;min-height:200px">
+            <canvas id="evo-canvas" style="position:absolute;inset:0;width:100%;height:100%"></canvas>
+            <div id="evo-nd" class="no-data" style="position:absolute;inset:0">Il faut ≥ 2 périodes avec des notes</div>
+          </div>
+        </div>
+
+        <!-- Class comparison delta list -->
+        <div class="adv-card">
+          <div class="adv-hdr">
+            <div class="adv-title"><i class="ti ti-scale" style="color:var(--wa)"></i>Moi vs Classe</div>
+          </div>
+          <div class="adv-sub">Matières où tu es le plus au-dessus ou en-dessous de la moyenne classe</div>
+          <div id="diff-list-wrap" style="flex:1;overflow-y:auto">
+            <div id="diff-list" class="diff-list"></div>
+            <div id="diff-nd" class="no-data">Entrez des moyennes classe (colonne bleue) pour voir cette analyse</div>
+          </div>
+        </div>
+
+        <!-- Grouped bar chart moi vs classe vs périodes -->
+        <div class="adv-card">
+          <div class="adv-hdr">
+            <div class="adv-title"><i class="ti ti-chart-bar" style="color:#fb923c"></i>Comparaison par matière</div>
+          </div>
+          <div class="adv-sub">Ma note vs moyenne classe, par période</div>
+          <div id="cmp-period-sel" style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px"></div>
+          <div id="cmp-legend" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px"></div>
+          <div style="flex:1;position:relative;min-height:200px">
+            <canvas id="cmp-canvas" style="position:absolute;inset:0;width:100%;height:100%"></canvas>
+            <div id="cmp-nd" class="no-data" style="position:absolute;inset:0">Ajoutez des notes pour voir ce graphique</div>
+          </div>
+        </div>
+
+        <!-- Subject evolution across periods -->
+        <div class="adv-card full">
+          <div class="adv-hdr">
+            <div class="adv-title"><i class="ti ti-arrows-diff" style="color:var(--wa)"></i>Évolution par matière</div>
+          </div>
+          <div class="adv-sub">Progression des notes entre périodes pour les matières communes</div>
+          <div id="sevo-wrap" style="overflow-y:auto;max-height:320px">
+            <div id="sevo"></div>
+            <div id="sevo-nd" class="no-data">Il faut ≥ 2 périodes avec des matières communes</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ════════════════════════════════════════════════
+   CONSTANTS
+════════════════════════════════════════════════ */
+const PRESETS=[
+  {n:'Français',                   c:'#87CEEB',d:'#0a2232'},
+  {n:'Mathématiques',              c:'#e8e8f0',d:'#1a1a2a'},
+  {n:'Histoire-Géo',               c:'#f06060',d:'#fff'},
+  {n:'HGGSP',                      c:'#f5a623',d:'#1a0e00'},
+  {n:'SES',                        c:'#4caf6a',d:'#0a1f10'},
+  {n:'ES-SVT',                     c:'#81c784',d:'#0a1f0b'},
+  {n:'ES-Physique',                c:'#f48fb1',d:'#2a0a14'},
+  {n:'Sport',                      c:'#c084fc',d:'#1a0a2a'},
+  {n:'Anglais',                    c:'#5aadee',d:'#051520'},
+  {n:'Allemand',                   c:'#fde047',d:'#1a1500'},
+  {n:'NSI',                        c:'#9ca3af',d:'#0f1117'},
+  {n:'HLP',                        c:'#6080e8',d:'#e8eeff'},
+  {n:'LLCE',                       c:'#e05555',d:'#fff'},
+  {n:'AMC',                        c:'#f0f0f0',d:'#111'},
+  {n:'Physique',                   c:'#b57bee',d:'#100620'},
+  {n:'SVT',                        c:'#86efac',d:'#052e16'},
+  {n:'SI',                         c:'#93c5fd',d:'#0a1f38'},
+  {n:'LLCA',                       c:'#fde047',d:'#1a1400'},
+  {n:'Latin',                      c:'#fb923c',d:'#1a0800'},
+  {n:'Grec',                       c:'#d1d5db',d:'#111827'},
+  {n:'Opt. Maths complémentaires', c:'#fdba74',d:'#1a0800'},
+  {n:'Opt. Maths expertes',        c:'#fca5a5',d:'#450a0a'},
+  {n:'Opt. Sport',                 c:'#4ade80',d:'#052e16'},
+];
+
+// Distinct color palette per subject (for charts)
+const SUBJECT_PALETTE=[
+  '#6272f5','#22d3a0','#f5a623','#f05252','#5aadee',
+  '#a78bfa','#fb923c','#34d399','#f472b6','#fbbf24',
+  '#60a5fa','#a3e635','#e879f9','#2dd4bf','#f87171',
+];
+
+const TAB_COLORS=['#6272f5','#22d3a0','#f5a623','#f05252','#5aadee','#a78bfa','#fb923c'];
+
+/* ════════════════════════════════════════════════
+   STATE
+════════════════════════════════════════════════ */
+let periods=[], activePid=null, useC=true, idc=0, idp=0;
+let dragSrc=null, curTab='main', cmpSelPids=null;
+
+/* ════════════════════════════════════════════════
+   DOM REFS
+════════════════════════════════════════════════ */
+const qinp=document.getElementById('qinp');
+const mval=document.getElementById('mval');
+const mtag=document.getElementById('mtag');
+const mmeta=document.getElementById('mmeta');
+const avgLbl=document.getElementById('avg-period-lbl');
+const slist=document.getElementById('slist');
+const empty=document.getElementById('empty');
+const colH=document.getElementById('col-h');
+const badge=document.getElementById('count-badge');
+const ioMsg=document.getElementById('io-msg');
+const povSec=document.getElementById('pov-sec');
+const povRows=document.getElementById('pov-rows');
+const sm3=document.getElementById('sm3');
+const fullSg=document.getElementById('full-sg');
+const genAvgRow=document.getElementById('gen-avg-row');
+const genAvgVal=document.getElementById('gen-avg-val');
+const vsClassPill=document.getElementById('vs-class-pill');
+
+/* ════════════════════════════════════════════════
+   HELPERS
+════════════════════════════════════════════════ */
+function activePeriod(){return periods.find(p=>p.id===activePid)||null}
+function makePeriod(name){return{id:++idp,name,subjects:[]}}
+function periodColor(p){return TAB_COLORS[periods.indexOf(p)%TAB_COLORS.length]}
+
+// subject color — consistent by name across the app
+const _subjectColorCache={};
+function subjectColor(name){
+  if(!_subjectColorCache[name]){
+    const preset=PRESETS.find(p=>p.n===name);
+    if(preset){_subjectColorCache[name]=preset.c}
+    else{
+      // deterministic hash-based color from palette
+      let h=0;for(let i=0;i<name.length;i++)h=(h*31+name.charCodeAt(i))&0xffff;
+      _subjectColorCache[name]=SUBJECT_PALETTE[h%SUBJECT_PALETTE.length];
+    }
+  }
+  return _subjectColorCache[name];
+}
+
+function gradeColor(g){
+  if(g>=16)return '#22d3a0';if(g>=14)return '#5aadee';
+  if(g>=12)return '#6272f5';if(g>=10)return '#f5a623';return '#f05252';
+}
+function gradeMention(g){
+  if(g>=16)return['Très bien','#22d3a0','rgba(34,211,160,.12)'];
+  if(g>=14)return['Bien','#5aadee','rgba(90,173,238,.12)'];
+  if(g>=12)return['Assez bien','#6272f5','rgba(98,114,245,.12)'];
+  if(g>=10)return['Passable','#f5a623','rgba(245,166,35,.12)'];
+  return['Insuffisant','#f05252','rgba(240,82,82,.12)'];
+}
+
+/* ════════════════════════════════════════════════
+   AVERAGE CALCULATION (CORRECT)
+   Each subject = 1 note. Weighted by coeff.
+   getPeriodAvg = Σ(grade × coeff) / Σ(coeff)
+   getGeneralAvg = Σ(periodAvg × nbNotes) / Σ(nbNotes)
+   (pondéré par le nombre de notes dans chaque période)
+════════════════════════════════════════════════ */
+function getPeriodAvg(p){
+  const v=p.subjects.filter(s=>s.grade!==''&&!isNaN(s.grade)&&s.grade!==null);
+  if(!v.length)return null;
+  let sum=0,tc=0;
+  v.forEach(s=>{const c=useC?(+s.coeff||1):1;sum+=s.grade*c;tc+=c});
+  return tc>0?sum/tc:null;
+}
+
+function getGeneralAvg(){
+  // Weighted by number of valid notes in each period
+  let wsum=0, wtotal=0;
+  periods.forEach(p=>{
+    const v=p.subjects.filter(s=>s.grade!==''&&!isNaN(s.grade)&&s.grade!==null);
+    const avg=getPeriodAvg(p);
+    if(avg!==null){wsum+=avg*v.length;wtotal+=v.length}
+  });
+  return wtotal>0?wsum/wtotal:null;
+}
+
+function getValid(p){
+  const per=p||activePeriod();
+  return per?per.subjects.filter(s=>s.grade!==''&&!isNaN(s.grade)&&s.grade!==null):[];
+}
+
+/* ════════════════════════════════════════════════
+   APP TAB SWITCH
+════════════════════════════════════════════════ */
+function switchAppTab(tab){
+  curTab=tab;
+  document.getElementById('view-main').classList.toggle('hidden',tab!=='main');
+  document.getElementById('view-stats').classList.toggle('hidden',tab!=='stats');
+  document.getElementById('app-tab-main').classList.toggle('active',tab==='main');
+  document.getElementById('app-tab-stats').classList.toggle('active',tab==='stats');
+  document.getElementById('period-tabs').style.display=tab==='main'?'flex':'none';
+  document.getElementById('new-tab-btn').style.display=tab==='main'?'flex':'none';
+  if(tab==='stats')renderAdvancedStats();
+}
+
+/* ════════════════════════════════════════════════
+   PERIODS
+════════════════════════════════════════════════ */
+function setPeriodMode(mode){
+  if(mode==='trimestre') periods=[makePeriod('Trimestre 1'),makePeriod('Trimestre 2'),makePeriod('Trimestre 3')];
+  else periods=[makePeriod('Semestre 1'),makePeriod('Semestre 2')];
+  activePid=periods[0].id;cmpSelPids=null;renderAll();
+}
+function addCustomPeriod(){
+  const nm=prompt('Nom de la période :','Période '+(periods.length+1));
+  if(!nm)return;
+  const p=makePeriod(nm.trim());periods.push(p);activePid=p.id;cmpSelPids=null;renderAll();
+}
+function removePeriod(id){
+  if(periods.length<=1){showMsg('Au moins une période requise.',false);return}
+  periods=periods.filter(p=>p.id!==id);
+  if(activePid===id)activePid=periods[0].id;
+  renderAll();
+}
+
+/* ════════════════════════════════════════════════
+   CHROME PERIOD TABS
+════════════════════════════════════════════════ */
+function renderChromeTabs(){
+  const bar=document.getElementById('period-tabs');bar.innerHTML='';
+  periods.forEach((p,i)=>{
+    const avg=getPeriodAvg(p);
+    const col=TAB_COLORS[i%TAB_COLORS.length];
+    const t=document.createElement('div');
+    t.className='chrome-tab'+(p.id===activePid?' active':'');
+    t.onclick=e=>{if(e.target.closest('.tab-close'))return;activePid=p.id;renderAll()};
+    t.innerHTML=`<span class="tab-dot" style="background:${col}"></span>
+      <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100px">${p.name}</span>
+      ${avg!==null?`<span class="tab-avg">${avg.toFixed(1)}</span>`:''}
+      ${periods.length>1?`<button class="tab-close" onclick="removePeriod(${p.id})"><i class="ti ti-x" style="font-size:10px"></i></button>`:''}`;
+    bar.appendChild(t);
+  });
+}
+
+/* ════════════════════════════════════════════════
+   CHIPS
+════════════════════════════════════════════════ */
+(function buildChips(){
+  const w=document.getElementById('chips');
+  PRESETS.forEach(p=>{
+    const b=document.createElement('button');
+    b.className='chip';b.style.background=p.c;b.style.color=p.d;b.textContent=p.n;
+    b.onclick=()=>{
+      const per=activePeriod();if(!per)return;
+      const id=++idc;per.subjects.push({id,name:p.n,grade:'',coeff:1,classAvg:''});
+      renderAll();setTimeout(()=>{const g=document.getElementById('g-'+id);if(g)g.focus()},50);
+    };
+    w.appendChild(b);
+  });
+})();
+
+/* ════════════════════════════════════════════════
+   EVENTS
+════════════════════════════════════════════════ */
+document.getElementById('ctog').addEventListener('change',e=>{useC=e.target.checked;renderAll()});
+qinp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();parseQuick();setTimeout(()=>qinp.focus(),20)}});
+
+function parseQuick(){
+  const raw=qinp.value.trim().replace(/,/g,'.');if(!raw)return;
+  const parts=raw.split(/\s+/);
+  let grade=NaN,coeff=1,nameParts=[];
+  for(const p of parts){
+    if(isNaN(grade)&&!isNaN(parseFloat(p))){
+      if(p.includes('/')){const[g,c]=p.split('/');grade=parseFloat(g);const cv=parseFloat(c);if(!isNaN(cv))coeff=cv}
+      else grade=parseFloat(p);
+    } else if(!isNaN(grade)&&!isNaN(parseFloat(p))&&!nameParts.length){coeff=parseFloat(p)}
+    else nameParts.push(p);
+  }
+  if(isNaN(grade)||grade<0||grade>20){qinp.style.borderColor='var(--er)';setTimeout(()=>{qinp.style.borderColor=''},600);return}
+  const per=activePeriod();if(!per)return;
+  per.subjects.push({id:++idc,name:nameParts.join(' '),grade,coeff,classAvg:''});
+  qinp.value='';renderAll();
+}
+
+function removeSubject(id){const per=activePeriod();if(per){per.subjects=per.subjects.filter(s=>s.id!==id);renderAll()}}
+function clearAll(){const per=activePeriod();if(per){per.subjects=[];renderAll()}}
+
+/* ════════════════════════════════════════════════
+   SUBJECTS RENDER
+════════════════════════════════════════════════ */
+function gridCols(){return useC?'14px 1fr 62px 62px 62px 20px':'14px 1fr 62px 62px 20px'}
+
+function renderSubjects(){
+  const per=activePeriod();const subs=per?per.subjects:[];
+  const gc=gridCols();
+  // header
+  colH.innerHTML='';colH.style.gridTemplateColumns=gc;
+  const hcols=useC?['','Matière','Note /20','Moy. classe','Coeff','']:['','Matière','Note /20','Moy. classe',''];
+  hcols.forEach(t=>{
+    const d=document.createElement('div');
+    d.style.cssText='font-size:9.5px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;padding:3px 0;'+(t==='Moy. classe'?'color:var(--in);text-align:center':'color:var(--mu);'+(hcols.indexOf(t)>1?'text-align:center':''));
+    d.textContent=t;colH.appendChild(d);
+  });
+  slist.innerHTML='';badge.textContent=subs.length;
+  const dh=document.getElementById('drag-hint');
+  dh.textContent=subs.length>1?'· glisser':'';
+  if(!subs.length){empty.style.display='';colH.style.display='none';return}
+  empty.style.display='none';colH.style.display='grid';
+
+  subs.forEach((s,idx)=>{
+    const row=document.createElement('div');
+    row.className='srow';row.style.gridTemplateColumns=gc;
+    row.draggable=true;row.dataset.id=s.id;
+    row.addEventListener('dragstart',e=>{dragSrc=idx;row.classList.add('dragging');e.dataTransfer.effectAllowed='move'});
+    row.addEventListener('dragend',()=>{row.classList.remove('dragging');document.querySelectorAll('.srow').forEach(r=>r.classList.remove('dragover'))});
+    row.addEventListener('dragover',e=>{e.preventDefault();row.classList.add('dragover')});
+    row.addEventListener('dragleave',()=>row.classList.remove('dragover'));
+    row.addEventListener('drop',e=>{
+      e.preventDefault();row.classList.remove('dragover');
+      if(dragSrc===null||dragSrc===idx)return;
+      const p2=activePeriod();if(!p2)return;
+      const [mv]=p2.subjects.splice(dragSrc,1);p2.subjects.splice(idx,0,mv);dragSrc=null;renderAll();
+    });
+    // drag handle
+    const handle=document.createElement('div');handle.className='drag-h';handle.innerHTML='<i class="ti ti-grip-vertical" style="font-size:12px"></i>';
+    // name
+    const ni=document.createElement('input');ni.type='text';ni.placeholder='Matière…';ni.value=s.name;
+    ni.style.color=subjectColor(s.name);
+    ni.addEventListener('input',e=>{s.name=e.target.value;delete _subjectColorCache[s.name];ni.style.color=subjectColor(s.name);calcAndStats();renderBars()});
+    ni.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();qinp.focus()}});
+    // grade
+    const gi=document.createElement('input');gi.type='number';gi.min=0;gi.max=20;gi.step=0.5;gi.placeholder='—';gi.id='g-'+s.id;
+    if(s.grade!=='')gi.value=s.grade;
+    gi.addEventListener('input',e=>{let v=parseFloat(e.target.value.replace(',','.'));if(isNaN(v)){s.grade=''}else{v=Math.min(20,Math.max(0,v));s.grade=v;e.target.value=v}calcAndStats();renderBars();renderHisto()});
+    gi.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();qinp.focus()}});
+    // class avg
+    const ci2=document.createElement('input');ci2.type='number';ci2.min=0;ci2.max=20;ci2.step=0.5;ci2.placeholder='cl.';ci2.className='class-inp';
+    ci2.title='Moyenne de la classe /20';
+    if(s.classAvg!==undefined&&s.classAvg!=='')ci2.value=s.classAvg;
+    ci2.addEventListener('input',e=>{let v=parseFloat(e.target.value.replace(',','.'));if(isNaN(v)){s.classAvg=''}else{v=Math.min(20,Math.max(0,v));s.classAvg=v;e.target.value=v}calcAndStats();if(curTab==='stats')renderAdvancedStats()});
+    ci2.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();qinp.focus()}});
+    row.appendChild(handle);row.appendChild(ni);row.appendChild(gi);row.appendChild(ci2);
+    if(useC){
+      const ci=document.createElement('input');ci.type='number';ci.min=0.5;ci.max=20;ci.step=0.5;ci.value=s.coeff||1;
+      ci.addEventListener('input',e=>{let v=parseFloat(e.target.value);if(isNaN(v)||v<=0)v=1;s.coeff=v;calcAndStats()});
+      ci.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();qinp.focus()}});
+      row.appendChild(ci);
+    }
+    const db=document.createElement('button');db.className='del';db.innerHTML='<i class="ti ti-x" style="font-size:11px"></i>';
+    db.onclick=()=>removeSubject(s.id);row.appendChild(db);
+    slist.appendChild(row);
+  });
+}
+
+/* ════════════════════════════════════════════════
+   CALC & STATS
+════════════════════════════════════════════════ */
+function calcAndStats(){
+  const per=activePeriod();
+  avgLbl.textContent='Moyenne — '+(per?per.name:'');
+  const valid=getValid();
+  renderPovSection();
+
+  if(!valid.length){
+    mval.textContent='—';mval.style.color='var(--mu)';
+    mtag.textContent='';mtag.style.background='transparent';
+    mmeta.innerHTML='';sm3.innerHTML='';fullSg.innerHTML='';
+    vsClassPill.style.display='none';return;
+  }
+
+  let sum=0,tc=0;
+  valid.forEach(s=>{const c=useC?(+s.coeff||1):1;sum+=s.grade*c;tc+=c});
+  const avg=sum/tc;
+  mval.textContent=avg.toFixed(2);
+  const [label,col,tbg]=gradeMention(avg);
+  mval.style.color=col;
+  mtag.textContent=label;mtag.style.cssText=`font-size:10.5px;font-weight:600;padding:3px 9px;border-radius:20px;margin-left:5px;background:${tbg};color:${col}`;
+  const totalCoeff=useC?tc:valid.length;
+  mmeta.innerHTML=`<span class="mmeta-item"><i class="ti ti-stack-2" style="font-size:11px"></i>${valid.length} matière${valid.length>1?'s':''}</span>${useC?`<span class="mmeta-item"><i class="ti ti-x" style="font-size:10px"></i>${totalCoeff} coeff.</span>`:''}`;
+
+  // vs class pill
+  const classValid=valid.filter(s=>s.classAvg!==''&&!isNaN(s.classAvg));
+  if(classValid.length){
+    let cs=0,ct=0,ms=0,mt=0;
+    classValid.forEach(s=>{const c=useC?(+s.coeff||1):1;cs+=s.classAvg*c;ct+=c;ms+=s.grade*c;mt+=c});
+    const classAvg=cs/ct,myAvg=ms/mt,diff=myAvg-classAvg;
+    vsClassPill.style.display='';
+    vsClassPill.style.cssText=`display:block;margin-top:6px;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;font-family:var(--mono);width:fit-content;background:${diff>=0?'rgba(34,211,160,.12)':'rgba(240,82,82,.12)'};color:${diff>=0?'#22d3a0':'#f05252'};border:1px solid ${diff>=0?'rgba(34,211,160,.25)':'rgba(240,82,82,.25)'}`;
+    vsClassPill.textContent=`${diff>=0?'▲':'▼'} ${diff>=0?'+':''}${diff.toFixed(2)} vs classe (moy. ${classAvg.toFixed(2)})`;
+  } else vsClassPill.style.display='none';
+
+  const grades=valid.map(s=>s.grade);
+  const sorted=[...grades].sort((a,b)=>a-b);
+  const n=sorted.length;
+  const med=n%2===0?(sorted[n/2-1]+sorted[n/2])/2:sorted[Math.floor(n/2)];
+  const variance=grades.reduce((a,g)=>a+(g-avg)**2,0)/n;
+  const ecart=Math.sqrt(variance);
+  const best=sorted[n-1],worst=sorted[0];
+  const bestS=valid.reduce((a,b)=>a.grade>b.grade?a:b);
+  const worstS=valid.reduce((a,b)=>a.grade<b.grade?a:b);
+  const pctAbove=Math.round(grades.filter(g=>g>=10).length/n*100);
+
+  sm3.innerHTML='';
+  [{l:'Médiane',v:med.toFixed(1),c:gradeColor(med)},{l:'Écart-type',v:ecart.toFixed(2),c:'var(--tx2)'},{l:'≥ 10/20',v:pctAbove+'%',c:pctAbove===100?'#22d3a0':pctAbove>=50?'#f5a623':'#f05252'}]
+    .forEach(s=>{const d=document.createElement('div');d.className='smc';d.innerHTML=`<div class="smc-l">${s.l}</div><div class="smc-v" style="color:${s.c}">${s.v}</div>`;sm3.appendChild(d)});
+
+  const stats=[
+    {l:'Médiane',v:med.toFixed(2),c:gradeColor(med)},
+    {l:'Meilleure note',v:`${best.toFixed(1)} · ${bestS.name||'?'}`,c:'#22d3a0',sm:true},
+    {l:'Note la plus basse',v:`${worst.toFixed(1)} · ${worstS.name||'?'}`,c:'#f05252',sm:true},
+    {l:'Écart-type',v:ecart.toFixed(2),c:'var(--tx2)'},
+    {l:'Amplitude',v:(best-worst).toFixed(1),c:'var(--tx2)'},
+    {l:'Notes ≥ 10/20',v:pctAbove+'%',c:pctAbove===100?'#22d3a0':pctAbove>=50?'#f5a623':'#f05252'},
+  ];
+  if(avg<10)stats.push({l:'Points pour 10/20',v:(tc*(10-avg)).toFixed(1),c:'#f05252',sm:true});
+  else if(avg<12)stats.push({l:'Points pour 12/20',v:(tc*(12-avg)).toFixed(1),c:'#f5a623',sm:true});
+  if(classValid.length){
+    let cs=0,ct=0,ms=0,mt=0;classValid.forEach(s=>{const c=useC?(+s.coeff||1):1;cs+=s.classAvg*c;ct+=c;ms+=s.grade*c;mt+=c});
+    const classAvg=cs/ct,myAvg=ms/mt,diff=myAvg-classAvg;
+    stats.push({l:'Moy. de la classe',v:classAvg.toFixed(2),c:'var(--in)'});
+    stats.push({l:'Écart vs classe',v:(diff>=0?'+':'')+diff.toFixed(2),c:diff>=0?'#22d3a0':'#f05252'});
+  }
+  if(periods.length>1){
+    const ga=getGeneralAvg();
+    if(ga!==null)stats.push({l:'Moyenne générale',v:ga.toFixed(2),c:gradeColor(ga)});
+  }
+  fullSg.innerHTML='';
+  stats.forEach(s=>{
+    const d=document.createElement('div');d.className='sc';
+    d.innerHTML=`<div class="sc-l">${s.l}</div><div class="sc-v" style="font-size:${s.sm?'12.5px':'17px'};color:${s.c}">${s.v}</div>`;
+    fullSg.appendChild(d);
+  });
+}
+
+function renderPovSection(){
+  if(periods.length<=1){povSec.style.display='none';return}
+  povSec.style.display='';povRows.innerHTML='';
+  periods.forEach((p,i)=>{
+    const avg=getPeriodAvg(p);const col=avg!==null?gradeColor(avg):'var(--mu)';const tc=TAB_COLORS[i%TAB_COLORS.length];
+    const nv=p.subjects.filter(s=>s.grade!==''&&!isNaN(s.grade)).length;
+    const row=document.createElement('div');row.className='pov-row'+(p.id===activePid?' active-pov':'');
+    row.innerHTML=`<div style="display:flex;align-items:center;gap:7px"><span style="width:7px;height:7px;border-radius:50%;background:${tc};flex-shrink:0;display:inline-block"></span><span style="font-size:12px;font-weight:500">${p.name}</span><span style="font-size:10.5px;color:var(--mu)">${nv} note${nv>1?'s':''}</span></div><span class="pov-avg" style="color:${col}">${avg!==null?avg.toFixed(2):'—'}</span>`;
+    row.onclick=()=>{activePid=p.id;renderAll()};povRows.appendChild(row);
+  });
+  const ga=getGeneralAvg();
+  if(ga!==null){genAvgRow.style.display='flex';genAvgVal.textContent=ga.toFixed(2);genAvgVal.style.color=gradeColor(ga)}
+  else genAvgRow.style.display='none';
+}
+
+/* ════════════════════════════════════════════════
+   MAIN VIEW CHARTS
+════════════════════════════════════════════════ */
+function renderBars(){
+  const valid=getValid();
+  const card=document.getElementById('bars-card');
+  const classLegend=document.getElementById('bars-class-legend');
+  if(!valid.length){card.style.display='none';return}
+  card.style.display='';
+  const hasClass=valid.some(s=>s.classAvg!==''&&!isNaN(s.classAvg));
+  classLegend.style.display=hasClass?'':'none';
+  const sorted=[...valid].sort((a,b)=>b.grade-a.grade);
+  const barsDiv=document.getElementById('bars');barsDiv.innerHTML='';
+  sorted.forEach(s=>{
+    const pct=(s.grade/20)*100;
+    const col=subjectColor(s.name);
+    const d=document.createElement('div');d.style.cssText='display:flex;align-items:center;gap:8px;margin-bottom:6px';
+    const hasC=s.classAvg!==''&&!isNaN(s.classAvg);
+    const cpct=hasC?(s.classAvg/20)*100:null;
+    const diff=hasC?s.grade-s.classAvg:null;
+    d.innerHTML=`
+      <div style="font-size:11.5px;color:${col};width:88px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0;font-weight:500">${s.name||'<em style="color:var(--mu)">—</em>'}</div>
+      <div class="bar-bg">
+        <div class="bar-fill" style="width:${pct}%;background:${col}88"></div>
+        ${cpct!==null?`<div style="position:absolute;top:0;left:${cpct}%;width:2px;height:100%;background:var(--in);opacity:.9"></div>`:''}
+      </div>
+      ${useC?`<div style="font-size:9.5px;color:var(--mu);width:20px;flex-shrink:0;text-align:center">×${s.coeff}</div>`:''}
+      ${hasC?`<div style="font-size:10px;font-family:var(--mono);color:${diff>=0?'#22d3a0':'#f05252'};width:32px;flex-shrink:0;text-align:right">${diff>=0?'+':''}${diff.toFixed(1)}</div>`:'<div style="width:32px;flex-shrink:0"></div>'}
+      <div style="font-size:12px;font-weight:600;color:${gradeColor(s.grade)};width:28px;text-align:right;flex-shrink:0;font-family:var(--mono)">${Number(s.grade).toFixed(1)}</div>`;
+    barsDiv.appendChild(d);
+  });
+}
+
+function renderHisto(){
+  const valid=getValid();
+  const card=document.getElementById('histo-card');
+  if(valid.length<2){card.style.display='none';return}
+  card.style.display='';
+  const bins=[{r:'0–4',mn:0,mx:4},{r:'5–7',mn:5,mx:7},{r:'8–9',mn:8,mx:9},{r:'10–11',mn:10,mx:11},{r:'12–13',mn:12,mx:13},{r:'14–15',mn:14,mx:15},{r:'16–20',mn:16,mx:20}];
+  const counts=bins.map(b=>valid.filter(s=>s.grade>=b.mn&&s.grade<=b.mx).length);
+  const mx=Math.max(...counts,1);
+  const cols=['#f05252','#f05252','#f87171','#f5a623','#6272f5','#5aadee','#22d3a0'];
+  const hw=document.getElementById('histo');const hl=document.getElementById('hlabel');
+  hw.innerHTML='';hl.innerHTML='';
+  counts.forEach((c,i)=>{
+    const h=Math.max((c/mx)*60,c>0?4:2);
+    const col=document.createElement('div');col.className='hcol';
+    col.style.cssText=`height:${h}px;background:${c>0?cols[i]:'var(--p2)'}`;
+    if(c>0){const l=document.createElement('div');l.style.cssText='position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--tx2);font-family:var(--mono)';l.textContent=c;col.appendChild(l)}
+    hw.appendChild(col);
+    const sp=document.createElement('span');sp.textContent=bins[i].r;hl.appendChild(sp);
+  });
+}
+
+/* ════════════════════════════════════════════════
+   ADVANCED STATS
+════════════════════════════════════════════════ */
+function renderAdvancedStats(){renderRadar();renderEvoLine();renderDiffList();renderCmpChart();renderSubjectEvo()}
+
+/* ── RADAR ─────────────────────────────────── */
+function renderRadar(){
+  const cv=document.getElementById('radar-canvas'),nd=document.getElementById('radar-nd');
+  const per=activePeriod();
+  const valid=per?per.subjects.filter(s=>s.grade!==''&&!isNaN(s.grade)):[];
+  if(valid.length<3){nd.style.display='flex';cv.style.display='none';return}
+  nd.style.display='none';cv.style.display='block';
+  const ctx=cv.getContext('2d');const W=cv.width,H=cv.height;ctx.clearRect(0,0,W,H);
+  const cx=W/2,cy=H/2+8,R=Math.min(W,H)*0.33;
+  const items=valid.slice(0,12);const n=items.length;
+  const angles=items.map((_,i)=>-Math.PI/2+(i/n)*2*Math.PI);
+  // grid
+  [.25,.5,.75,1].forEach(f=>{
+    ctx.beginPath();angles.forEach((a,i)=>{const x=cx+Math.cos(a)*R*f,y=cy+Math.sin(a)*R*f;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y)});
+    ctx.closePath();ctx.strokeStyle=f===1?'rgba(255,255,255,.1)':'rgba(255,255,255,.05)';ctx.lineWidth=1;ctx.stroke();
+    ctx.fillStyle='rgba(96,100,136,.65)';ctx.font='9px var(--mono)';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(Math.round(f*20),cx+2,cy-R*f+1);
+  });
+  angles.forEach(a=>{ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+Math.cos(a)*R,cy+Math.sin(a)*R);ctx.strokeStyle='rgba(255,255,255,.06)';ctx.lineWidth=1;ctx.stroke()});
+  // polygon
+  ctx.beginPath();items.forEach((s,i)=>{const f=s.grade/20,x=cx+Math.cos(angles[i])*R*f,y=cy+Math.sin(angles[i])*R*f;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y)});ctx.closePath();
+  const g=ctx.createRadialGradient(cx,cy,0,cx,cy,R);g.addColorStop(0,'rgba(98,114,245,.3)');g.addColorStop(1,'rgba(34,211,160,.1)');
+  ctx.fillStyle=g;ctx.fill();ctx.strokeStyle='rgba(98,114,245,.7)';ctx.lineWidth=1.5;ctx.stroke();
+  // class avg polygon if exists
+  const withClass=items.filter(s=>s.classAvg!==''&&!isNaN(s.classAvg));
+  if(withClass.length>=3){
+    ctx.beginPath();items.forEach((s,i)=>{
+      const f=s.classAvg!==''&&!isNaN(s.classAvg)?s.classAvg/20:s.grade/20;
+      const x=cx+Math.cos(angles[i])*R*f,y=cy+Math.sin(angles[i])*R*f;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y)
+    });ctx.closePath();ctx.strokeStyle='rgba(90,173,238,.5)';ctx.lineWidth=1.5;ctx.setLineDash([4,3]);ctx.stroke();ctx.setLineDash([]);
+  }
+  // dots + labels
+  items.forEach((s,i)=>{
+    const f=s.grade/20,x=cx+Math.cos(angles[i])*R*f,y=cy+Math.sin(angles[i])*R*f;
+    const sc=subjectColor(s.name);
+    ctx.beginPath();ctx.arc(x,y,4,0,2*Math.PI);ctx.fillStyle=sc;ctx.fill();
+    const lx=cx+Math.cos(angles[i])*(R+20),ly=cy+Math.sin(angles[i])*(R+20);
+    ctx.fillStyle=sc;ctx.font='bold 10.5px var(--font)';
+    ctx.textAlign=lx>cx+4?'left':lx<cx-4?'right':'center';ctx.textBaseline=ly>cy+4?'top':ly<cy-4?'bottom':'middle';
+    ctx.fillText(s.name.length>9?s.name.slice(0,8)+'…':s.name,lx,ly);
+    ctx.fillStyle=gradeColor(s.grade);ctx.font='500 9.5px var(--mono)';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(Number(s.grade).toFixed(1),x,y-11);
+  });
+}
+
+/* ── AVG EVOLUTION LINE ─────────────────────── */
+function renderEvoLine(){
+  const wrap=document.getElementById('evo-canvas').parentElement;
+  const cv=document.getElementById('evo-canvas'),nd=document.getElementById('evo-nd');
+  const data=periods.map(p=>({name:p.name,avg:getPeriodAvg(p),n:getValid(p).length,col:periodColor(p)})).filter(d=>d.avg!==null);
+  if(data.length<2){nd.style.display='flex';cv.style.display='none';return}
+  nd.style.display='none';cv.style.display='block';
+  cv.width=wrap.clientWidth||460;cv.height=wrap.clientHeight||220;
+  const W=cv.width,H=cv.height,ctx=cv.getContext('2d');ctx.clearRect(0,0,W,H);
+  const pL=44,pR=16,pT=28,pB=38,w=W-pL-pR,h=H-pT-pB;
+  [0,5,10,15,20].forEach(v=>{
+    const y=pT+h*(1-v/20);ctx.beginPath();ctx.moveTo(pL,y);ctx.lineTo(pL+w,y);
+    ctx.strokeStyle=v===10?'rgba(255,255,255,.1)':'rgba(255,255,255,.04)';ctx.lineWidth=1;ctx.stroke();
+    ctx.fillStyle='rgba(96,100,136,.7)';ctx.font='10px var(--mono)';ctx.textAlign='right';ctx.textBaseline='middle';ctx.fillText(v,pL-7,y);
+  });
+  const nn=data.length;
+  const xs=data.map((_,i)=>pL+(i/(nn-1))*w);
+  const ys=data.map(d=>pT+h*(1-d.avg/20));
+  // fill
+  ctx.beginPath();ctx.moveTo(xs[0],pT+h);xs.forEach((x,i)=>ctx.lineTo(x,ys[i]));ctx.lineTo(xs[nn-1],pT+h);ctx.closePath();
+  const fg=ctx.createLinearGradient(0,pT,0,pT+h);fg.addColorStop(0,'rgba(98,114,245,.2)');fg.addColorStop(1,'rgba(98,114,245,.02)');ctx.fillStyle=fg;ctx.fill();
+  // line
+  ctx.beginPath();xs.forEach((x,i)=>i===0?ctx.moveTo(x,ys[i]):ctx.lineTo(x,ys[i]));ctx.strokeStyle='#6272f5';ctx.lineWidth=2;ctx.lineJoin='round';ctx.stroke();
+  // points
+  data.forEach((d,i)=>{
+    const x=xs[i],y=ys[i];
+    ctx.beginPath();ctx.arc(x,y,5,0,2*Math.PI);ctx.fillStyle=d.col;ctx.fill();
+    ctx.fillStyle=gradeColor(d.avg);ctx.font='bold 10.5px var(--mono)';ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText(d.avg.toFixed(2),x,y-8);
+    if(i>0){
+      const delta=d.avg-data[i-1].avg;
+      const dc=delta>0?'#22d3a0':'#f05252';
+      ctx.fillStyle=dc;ctx.font='bold 9.5px var(--mono)';ctx.fillText((delta>0?'▲':'▼')+Math.abs(delta).toFixed(1),x,y-20);
+    }
+    ctx.fillStyle='rgba(96,100,136,.8)';ctx.font='10.5px var(--font)';ctx.textBaseline='top';
+    const sn=d.name.length>10?d.name.slice(0,9)+'…':d.name;ctx.fillText(sn,x,pT+h+6);
+  });
+}
+
+/* ── DIFF LIST (moi vs classe ranking) ─────── */
+function renderDiffList(){
+  const nd=document.getElementById('diff-nd'),dl=document.getElementById('diff-list');
+  // gather all subjects with classAvg across all periods
+  const rows=[];
+  periods.forEach(p=>{
+    p.subjects.forEach(s=>{
+      if(s.grade!==''&&!isNaN(s.grade)&&s.classAvg!==''&&!isNaN(s.classAvg)){
+        rows.push({name:s.name,grade:s.grade,classAvg:s.classAvg,period:p.name,diff:s.grade-s.classAvg});
+      }
+    });
+  });
+  if(!rows.length){nd.style.display='flex';dl.innerHTML='';return}
+  nd.style.display='none';dl.innerHTML='';
+  rows.sort((a,b)=>b.diff-a.diff);
+  rows.forEach(r=>{
+    const col=subjectColor(r.name);
+    const cls=r.diff>0.5?'above':r.diff<-0.5?'below':'neutral';
+    const dc=r.diff>0?'#22d3a0':r.diff<0?'#f05252':'var(--mu)';
+    const d=document.createElement('div');d.className='diff-row '+cls;
+    d.innerHTML=`
+      <div>
+        <div class="diff-name" style="color:${col}">${r.name}</div>
+        <div style="font-size:10px;color:var(--mu);margin-top:1px">${r.period}</div>
+      </div>
+      <div class="diff-grades" style="font-size:10.5px">
+        <span style="color:${gradeColor(r.grade)}">${r.grade.toFixed(1)}</span>
+        <span style="color:var(--mu)"> / </span>
+        <span style="color:var(--in)">${Number(r.classAvg).toFixed(1)}</span>
+      </div>
+      <div class="diff-delta" style="color:${dc}">${r.diff>0?'+':''}${r.diff.toFixed(1)}</div>`;
+    dl.appendChild(d);
+  });
+}
+
+/* ── GROUPED BAR CHART ─────────────────────── */
+function renderCmpChart(){
+  const cv=document.getElementById('cmp-canvas'),nd=document.getElementById('cmp-nd');
+  const legend=document.getElementById('cmp-legend'),psel=document.getElementById('cmp-period-sel');
+  const actPeriods=periods.filter(p=>p.subjects.some(s=>s.grade!==''&&!isNaN(s.grade)));
+  if(!actPeriods.length){nd.style.display='flex';cv.style.display='none';legend.innerHTML='';psel.innerHTML='';return}
+  // period selector
+  psel.innerHTML='';
+  if(actPeriods.length>1){
+    const allB=document.createElement('button');allB.className='pfbtn'+(cmpSelPids===null?' sel':'');
+    allB.style.borderColor=cmpSelPids===null?'var(--ac)':'var(--bd)';allB.style.color=cmpSelPids===null?'var(--tx)':'var(--tx2)';
+    allB.textContent='Toutes';allB.onclick=()=>{cmpSelPids=null;renderCmpChart()};psel.appendChild(allB);
+    actPeriods.forEach((p,i)=>{
+      const col=TAB_COLORS[periods.indexOf(p)%TAB_COLORS.length];
+      const sel=cmpSelPids&&cmpSelPids.includes(p.id);
+      const b=document.createElement('button');b.className='pfbtn'+(sel?' sel':'');
+      b.style.borderColor=sel?col:'var(--bd)';b.style.color=sel?col:'var(--tx2)';
+      b.innerHTML=`<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${col};margin-right:4px"></span>${p.name}`;
+      b.onclick=()=>{
+        if(!cmpSelPids)cmpSelPids=[];
+        const idx=cmpSelPids.indexOf(p.id);if(idx>=0)cmpSelPids.splice(idx,1);else cmpSelPids.push(p.id);
+        if(!cmpSelPids.length)cmpSelPids=null;renderCmpChart();
+      };psel.appendChild(b);
+    });
+  }
+  const disPeriods=cmpSelPids===null?actPeriods:actPeriods.filter(p=>cmpSelPids.includes(p.id));
+  if(!disPeriods.length){nd.style.display='flex';cv.style.display='none';return}
+  const nameSet=new Set();
+  disPeriods.forEach(p=>p.subjects.forEach(s=>{if(s.grade!==''&&!isNaN(s.grade))nameSet.add(s.name||'?')}));
+  const subjects=[...nameSet];
+  if(!subjects.length){nd.style.display='flex';cv.style.display='none';return}
+  nd.style.display='none';cv.style.display='block';
+  const hasClass=disPeriods.some(p=>p.subjects.some(s=>s.classAvg!==''&&!isNaN(s.classAvg)&&s.grade!==''&&!isNaN(s.grade)));
+  // build series: one per period (colored by period), one for class (blue dashed)
+  const series=[];
+  disPeriods.forEach((p,i)=>{
+    const col=TAB_COLORS[periods.indexOf(p)%TAB_COLORS.length];
+    series.push({label:p.name,color:col,isClass:false,values:subjects.map(name=>{const s=p.subjects.find(sb=>sb.name===name&&sb.grade!==''&&!isNaN(sb.grade));return s?+s.grade:null})});
+  });
+  if(hasClass){
+    const classVals=subjects.map(name=>{
+      const vals=[];disPeriods.forEach(p=>{const s=p.subjects.find(sb=>sb.name===name&&sb.classAvg!==''&&!isNaN(sb.classAvg));if(s)vals.push(+s.classAvg)});
+      return vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:null;
+    });
+    series.push({label:'Moy. classe',color:'#5aadee',isClass:true,values:classVals});
+  }
+  // draw
+  const wrap=cv.parentElement;
+  cv.width=wrap.clientWidth||600;cv.height=Math.max(wrap.clientHeight,220);
+  const W=cv.width,H=cv.height,ctx=cv.getContext('2d');ctx.clearRect(0,0,W,H);
+  const pL=44,pR=16,pT=32,pB=subjects.length>6?72:52,cw=W-pL-pR,ch=H-pT-pB;
+  const nS=subjects.length,nSer=series.length;
+  const grpW=cw/nS;
+  const bW=Math.max(6,Math.min(28,(grpW*.82)/nSer));
+  const bGap=Math.max(1,bW*.12);
+  const grpTot=nSer*(bW+bGap)-bGap;
+  // grid
+  [0,5,10,15,20].forEach(v=>{
+    const y=pT+ch*(1-v/20);ctx.beginPath();ctx.moveTo(pL,y);ctx.lineTo(pL+cw,y);
+    ctx.strokeStyle=v===10?'rgba(255,255,255,.1)':'rgba(255,255,255,.05)';ctx.lineWidth=1;ctx.stroke();
+    ctx.fillStyle='rgba(96,100,136,.7)';ctx.font='10px var(--mono)';ctx.textAlign='right';ctx.textBaseline='middle';ctx.fillText(v,pL-7,y);
+  });
+  // bars
+  series.forEach((ser,si)=>{
+    subjects.forEach((name,ni)=>{
+      const val=ser.values[ni];if(val===null)return;
+      const gx=pL+ni*grpW+(grpW-grpTot)/2;
+      const bx=gx+si*(bW+bGap);
+      const bh=Math.max(2,(val/20)*ch),by=pT+ch-bh;
+      if(ser.isClass){
+        // class = thin transparent bar with dashed top line
+        ctx.fillStyle='rgba(90,173,238,.15)';
+        ctx.beginPath();ctx.roundRect(bx,by,bW,bh,2);ctx.fill();
+        ctx.save();ctx.strokeStyle='#5aadee';ctx.lineWidth=2;ctx.setLineDash([3,2]);
+        ctx.beginPath();ctx.moveTo(bx,by);ctx.lineTo(bx+bW,by);ctx.stroke();ctx.restore();
+      } else {
+        // subject color with gradient
+        const sc=subjectColor(name);
+        const gr=ctx.createLinearGradient(0,by,0,by+bh);gr.addColorStop(0,sc+'cc');gr.addColorStop(1,sc+'33');
+        ctx.fillStyle=gr;ctx.beginPath();ctx.roundRect(bx,by,bW,bh,Math.min(3,bW/3));ctx.fill();
+      }
+      if(bW>13){
+        ctx.fillStyle=ser.isClass?'#5aadee':gradeColor(val);
+        ctx.font=`600 ${Math.max(9,Math.min(10,bW-1))}px var(--mono)`;ctx.textAlign='center';ctx.textBaseline='bottom';
+        ctx.fillText(val.toFixed(1),bx+bW/2,by-2);
+      }
+    });
+  });
+  // delta annotations (vs class) for each subject
+  if(hasClass){
+    const classSer=series[series.length-1];
+    subjects.forEach((name,ni)=>{
+      const clV=classSer.values[ni];if(clV===null)return;
+      series.filter(s=>!s.isClass).forEach((ser,si)=>{
+        const myV=ser.values[ni];if(myV===null)return;
+        const delta=myV-clV;if(Math.abs(delta)<0.05)return;
+        const gx=pL+ni*grpW+(grpW-grpTot)/2;
+        const bx=gx+si*(bW+bGap)+bW/2;
+        const topY=pT+ch*(1-Math.max(myV,clV)/20)-18;
+        ctx.fillStyle=delta>0?'#22d3a0':'#f05252';
+        ctx.font=`bold 9px var(--mono)`;ctx.textAlign='center';ctx.textBaseline='bottom';
+        ctx.fillText((delta>0?'+':'')+delta.toFixed(1),bx,topY);
+      });
+    });
+  }
+  // x labels
+  subjects.forEach((name,ni)=>{
+    const gx=pL+ni*grpW+grpW/2;
+    ctx.fillStyle=subjectColor(name);
+    ctx.font=`500 ${Math.min(11,Math.max(9,Math.floor(grpW/Math.max(name.length*.6,4))))}px var(--font)`;
+    ctx.textAlign='center';ctx.textBaseline='top';
+    ctx.save();ctx.translate(gx,pT+ch+6);
+    if(nS>5)ctx.rotate(-Math.PI/5.5);
+    ctx.fillText(name.length>12?name.slice(0,11)+'…':name,0,0);ctx.restore();
+  });
+  // legend
+  legend.innerHTML='';
+  series.forEach(ser=>{
+    const item=document.createElement('div');item.style.cssText='display:flex;align-items:center;gap:5px;font-size:11px;color:var(--tx2)';
+    if(ser.isClass){item.innerHTML=`<span style="width:14px;border-top:2px dashed ${ser.color};display:inline-block"></span>${ser.label}`}
+    else{item.innerHTML=`<span style="width:10px;height:10px;border-radius:2px;background:${ser.color};display:inline-block"></span>${ser.label}`}
+    legend.appendChild(item);
+  });
+}
+
+/* ── SUBJECT EVOLUTION ─────────────────────── */
+function renderSubjectEvo(){
+  const wrap=document.getElementById('sevo'),nd=document.getElementById('sevo-nd');
+  const pwg=periods.filter(p=>p.subjects.some(s=>s.grade!==''&&!isNaN(s.grade)));
+  if(pwg.length<2){nd.style.display='flex';wrap.style.display='none';return}
+  const nameSet=new Set();
+  pwg.forEach(p=>p.subjects.forEach(s=>{if(s.grade!==''&&!isNaN(s.grade))nameSet.add(s.name)}));
+  const common=[...nameSet].filter(n=>pwg.filter(p=>p.subjects.some(s=>s.name===n&&s.grade!==''&&!isNaN(s.grade))).length>=2);
+  if(!common.length){nd.style.display='flex';wrap.style.display='none';return}
+  nd.style.display='none';wrap.style.display='';wrap.innerHTML='';
+  // header
+  const gc=`140px repeat(${pwg.length},1fr) 48px`;
+  const hdr=document.createElement('div');hdr.className='evo-hdr-row';hdr.style.gridTemplateColumns=gc;
+  hdr.innerHTML=`<span style="font-size:9.5px;color:var(--mu);text-transform:uppercase;letter-spacing:.05em">Matière</span>`
+    +pwg.map((p,i)=>`<div style="text-align:center;font-size:10px;font-weight:600;color:${TAB_COLORS[periods.indexOf(p)%TAB_COLORS.length]};text-overflow:ellipsis;overflow:hidden;white-space:nowrap">${p.name}</div>`).join('')
+    +`<div style="font-size:9.5px;color:var(--mu);text-align:right;text-transform:uppercase;letter-spacing:.05em">Δ</div>`;
+  wrap.appendChild(hdr);
+  common.sort().forEach(name=>{
+    const sc=subjectColor(name);
+    const grades=pwg.map(p=>{const s=p.subjects.find(sb=>sb.name===name&&sb.grade!==''&&!isNaN(sb.grade));return s?+s.grade:null});
+    const valids=grades.filter(g=>g!==null);
+    const delta=valids.length>=2?valids[valids.length-1]-valids[0]:null;
+    const row=document.createElement('div');row.className='evo-row';row.style.gridTemplateColumns=gc;
+    let html=`<span style="font-size:12px;color:${sc};font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${name}</span>`;
+    grades.forEach(g=>{
+      if(g===null){html+=`<div style="text-align:center;font-size:11px;color:var(--mu)">—</div>`;return}
+      const pct=(g/20)*100;const gc2=gradeColor(g);
+      html+=`<div style="display:flex;flex-direction:column;align-items:center;gap:2px;padding:0 4px">
+        <span style="font-size:11.5px;font-weight:700;font-family:var(--mono);color:${gc2}">${g.toFixed(1)}</span>
+        <div style="width:100%;background:var(--p2);border-radius:2px;height:4px;overflow:hidden"><div style="width:${pct}%;height:100%;background:${gc2}44;border-radius:2px"></div></div>
+      </div>`;
+    });
+    if(delta!==null){
+      const dc=delta>0?'#22d3a0':delta<0?'#f05252':'var(--mu)';
+      html+=`<div style="font-size:12px;font-weight:700;font-family:var(--mono);color:${dc};text-align:right">${delta>0?'+':''}${delta.toFixed(1)}</div>`;
+    }else html+=`<div></div>`;
+    row.innerHTML=html;wrap.appendChild(row);
+  });
+}
+
+/* ════════════════════════════════════════════════
+   RENDER ALL
+════════════════════════════════════════════════ */
+function renderAll(){
+  renderChromeTabs();renderSubjects();calcAndStats();renderBars();renderHisto();
+  if(curTab==='stats')renderAdvancedStats();
+}
+function showMsg(txt,ok=true){ioMsg.textContent=txt;ioMsg.style.color=ok?'#22d3a0':'#f05252';ioMsg.style.display='';setTimeout(()=>ioMsg.style.display='none',3000)}
+window.addEventListener('resize',()=>{if(curTab==='stats')renderAdvancedStats()});
+
+/* ════════════════════════════════════════════════
+   EXPORT / IMPORT / PDF
+════════════════════════════════════════════════ */
+function getMentionTxt(a){if(a>=16)return'Très bien';if(a>=14)return'Bien';if(a>=12)return'Assez bien';if(a>=10)return'Passable';return'Insuffisant'}
+function getMentionCol(a){if(a>=16)return'#1a5c3a';if(a>=14)return'#0c3a5c';if(a>=12)return'#2a2a7c';if(a>=10)return'#7c5a00';return'#7c1a1a'}
+function getMentionBg(a){if(a>=16)return'#d4f4e2';if(a>=14)return'#d4eaf7';if(a>=12)return'#dddff7';if(a>=10)return'#fdf0d0';return'#f7d4d4'}
+
+function printBulletin(){
+  const date=new Date().toLocaleDateString('fr-FR',{year:'numeric',month:'long',day:'numeric'});
+
+  // ── build period stats helper ──────────────────
+  function pStats(p){
+    const v=p.subjects.filter(s=>s.grade!==''&&!isNaN(s.grade));
+    if(!v.length)return null;
+    let sum=0,tc=0;v.forEach(s=>{const c=useC?(+s.coeff||1):1;sum+=s.grade*c;tc+=c});
+    const avg=sum/tc;
+    const gr=v.map(s=>+s.grade);
+    const srt=[...gr].sort((a,b)=>a-b);const nn=srt.length;
+    const med=nn%2===0?(srt[nn/2-1]+srt[nn/2])/2:srt[Math.floor(nn/2)];
+    const variance=gr.reduce((a,g)=>a+(g-avg)**2,0)/nn;
+    const ecart=Math.sqrt(variance);
+    const best=srt[nn-1],worst=srt[0];
+    const bestS=v.reduce((a,b)=>a.grade>b.grade?a:b);
+    const worstS=v.reduce((a,b)=>a.grade<b.grade?a:b);
+    const above10=gr.filter(g=>g>=10).length;
+    const pctAbove=Math.round(above10/nn*100);
+    const classV=v.filter(s=>s.classAvg!==''&&!isNaN(s.classAvg));
+    let classAvg=null,myVsClass=null;
+    if(classV.length){
+      let cs=0,ct=0,ms=0,mt=0;
+      classV.forEach(s=>{const c=useC?(+s.coeff||1):1;cs+=s.classAvg*c;ct+=c;ms+=s.grade*c;mt+=c});
+      classAvg=cs/ct;myVsClass=(ms/mt)-classAvg;
+    }
+    return{avg,med,ecart,best,worst,bestS,worstS,pctAbove,above10,nn,tc,classAvg,myVsClass,v};
+  }
+
+  // ── mini bar SVG helper (for PDF bar charts) ───
+  function miniBar(val,classVal){
+    const w=180,h=10,pct=(val/20)*100;
+    const cpct=classVal!==null?Math.round((classVal/20)*100):null;
+    const col=val>=16?'#1a7a5a':val>=14?'#1a5080':val>=12?'#2a3090':val>=10?'#8a5500':'#8a2020';
+    let bar=`<svg width="${w}" height="${h}" style="vertical-align:middle;border-radius:3px;overflow:visible">
+      <rect width="${w}" height="${h}" rx="3" fill="#e5e7eb"/>
+      <rect width="${Math.round(w*pct/100)}" height="${h}" rx="3" fill="${col}44"/>
+      <rect width="${Math.round(w*pct/100)}" height="${h}" rx="3" fill="${col}" opacity=".7"/>`;
+    if(cpct!==null)bar+=`<rect x="${Math.round(w*cpct/100)-1}" width="2" height="${h}" fill="#1565c0" opacity=".9"/>`;
+    bar+=`</svg>`;
+    return bar;
+  }
+
+  let html=`<html><head><meta charset="utf-8"><title>Bulletin de notes</title><style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',Georgia,serif;background:#fff;color:#111;font-size:12.5px;-webkit-font-smoothing:antialiased}
+.page{max-width:760px;margin:0 auto;padding:32px 38px}
+/* header */
+.hdr{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:16px;margin-bottom:20px;border-bottom:2px solid #111}
+.hdr-l .ttl{font-size:24px;font-weight:700;letter-spacing:-.03em}
+.hdr-l .sub{font-size:11.5px;color:#888;margin-top:3px}
+.hdr-r{text-align:right;font-size:11px;color:#888}
+/* general avg banner */
+.gen-banner{background:linear-gradient(135deg,#f8f9ff,#eef0ff);border:1px solid #d0d4f8;border-radius:12px;padding:16px 20px;margin-bottom:22px;display:flex;align-items:center;justify-content:space-between}
+.gen-avg-num{font-size:38px;font-weight:700;font-family:'JetBrains Mono',monospace;letter-spacing:-2px}
+.gen-avg-d{font-size:15px;color:#888}
+.gen-right{text-align:right}
+/* period section */
+.psec{margin-bottom:28px;break-inside:avoid}
+.psec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding-bottom:8px;border-bottom:2px solid #111}
+.ptit{font-size:15px;font-weight:700}
+.pavg{font-size:22px;font-weight:700;font-family:'JetBrains Mono',monospace}
+/* table */
+table{width:100%;border-collapse:collapse;font-size:12.5px;margin-bottom:12px}
+thead tr{background:#111}
+th{color:#fff;padding:7px 10px;font-weight:500;font-size:11px;letter-spacing:.03em;text-align:left}
+th.c{text-align:center}th.r{text-align:right}
+td{padding:6px 10px;border-bottom:1px solid #f0f0f0;vertical-align:middle}
+td.c{text-align:center;font-family:'JetBrains Mono',monospace;font-size:11.5px}
+td.r{text-align:right;font-family:'JetBrains Mono',monospace;font-weight:600;font-size:14px}
+td.diff{font-family:'JetBrains Mono',monospace;font-size:11px;text-align:center;font-weight:600}
+tr:nth-child(even) td{background:#fafafa}
+.avgrow td{background:#111 !important;color:#fff;font-weight:700;border:none}
+.avgrow td.r{font-size:16px}
+/* tag / badge */
+.tag{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;font-family:'Inter',sans-serif}
+/* stats grid */
+.sg{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-bottom:14px}
+.sc{background:#f8f9ff;border:1px solid #e5e7ef;border-radius:8px;padding:8px 12px}
+.sc-l{font-size:9.5px;color:#888;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
+.sc-v{font-size:17px;font-weight:700;font-family:'JetBrains Mono',monospace}
+/* class diff section */
+.diff-sec{margin-bottom:14px}
+.diff-sec-t{font-size:10.5px;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px;padding-left:2px}
+.diff-row{display:flex;align-items:center;justify-content:space-between;padding:5px 10px;border-radius:6px;margin-bottom:4px;border:1px solid #eee}
+.diff-row.above{border-left:3px solid #1a7a5a;background:#f0faf5}
+.diff-row.below{border-left:3px solid #8a2020;background:#fff5f5}
+.diff-row.same{border-left:3px solid #ccc}
+/* progression across periods */
+.prog-grid{display:grid;gap:6px}
+.prog-row{display:grid;gap:8px;align-items:center;padding:5px 8px;background:#f9f9fb;border-radius:6px}
+/* bars section in PDF */
+.bar-sec{margin-bottom:14px}
+/* footer */
+.ftr{margin-top:28px;border-top:1px solid #e0e0e0;padding-top:10px;font-size:10.5px;color:#bbb;display:flex;justify-content:space-between}
+@media print{body{font-size:11.5px}.page{padding:20px 24px}}
+</style></head><body><div class="page">`;
+
+  // ── PAGE HEADER ──────────────────────────────
+  html+=`<div class="hdr">
+    <div class="hdr-l">
+      <div class="ttl">Bulletin de notes</div>
+      <div class="sub">Calculateur de moyenne · ${useC?'avec coefficients':'sans coefficients'}</div>
+    </div>
+    <div class="hdr-r">
+      <div style="font-size:11.5px;font-weight:600">Édité le</div>
+      <div>${date}</div>
+    </div>
+  </div>`;
+
+  // ── GENERAL AVERAGE BANNER ───────────────────
+  if(periods.length>1){
+    const ga=getGeneralAvg();
+    if(ga!==null){
+      const [mlbl,mcol,mbg]=gradeMention(ga);
+      html+=`<div class="gen-banner">
+        <div>
+          <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:#888;margin-bottom:4px">Moyenne générale · toutes périodes</div>
+          <div style="display:flex;align-items:baseline;gap:6px">
+            <span class="gen-avg-num" style="color:${mcol}">${ga.toFixed(2)}</span>
+            <span class="gen-avg-d">/20</span>
+            <span class="tag" style="background:${mbg};color:${mcol}">${mlbl}</span>
+          </div>
+        </div>
+        <div class="gen-right">
+          <div style="font-size:10px;color:#888;margin-bottom:4px">Périodes saisies</div>
+          <div style="font-size:14px;font-weight:600">${periods.filter(p=>p.subjects.some(s=>s.grade!==''&&!isNaN(s.grade))).length} / ${periods.length}</div>
+          <div style="font-size:10px;color:#888;margin-top:4px">Total notes</div>
+          <div style="font-size:14px;font-weight:600">${periods.reduce((a,p)=>a+p.subjects.filter(s=>s.grade!==''&&!isNaN(s.grade)).length,0)}</div>
+        </div>
+      </div>`;
+
+      // Evolution summary across periods
+      const perData=periods.map(p=>({name:p.name,avg:getPeriodAvg(p)})).filter(d=>d.avg!==null);
+      if(perData.length>1){
+        html+=`<div style="background:#f9fafb;border:1px solid #e5e7ef;border-radius:10px;padding:12px 16px;margin-bottom:20px">
+          <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:#888;margin-bottom:10px">Évolution des moyennes par période</div>
+          <div style="display:flex;align-items:flex-end;gap:12px;height:60px;padding-bottom:4px">`;
+        const maxA=Math.max(...perData.map(d=>d.avg));
+        perData.forEach((d,i)=>{
+          const hpct=Math.max(15,(d.avg/20)*100);
+          const [,mcol2]=gradeMention(d.avg);
+          const delta=i>0?d.avg-perData[i-1].avg:null;
+          html+=`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
+            ${delta!==null?`<div style="font-size:9.5px;font-weight:700;color:${delta>0?'#1a7a5a':'#8a2020'}">${delta>0?'+':''}${delta.toFixed(2)}</div>`:'<div style="font-size:9.5px"> </div>'}
+            <div style="font-size:11px;font-weight:700;font-family:monospace;color:${mcol2}">${d.avg.toFixed(2)}</div>
+            <div style="width:100%;background:#e5e7ef;border-radius:3px;height:${Math.round(hpct*.36)}px;overflow:hidden">
+              <div style="width:100%;height:100%;background:${mcol2};opacity:.7;border-radius:3px"></div>
+            </div>
+            <div style="font-size:9.5px;color:#888;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%">${d.name}</div>
+          </div>`;
+        });
+        html+=`</div></div>`;
+      }
+    }
+  }
+
+  // ── PER-PERIOD SECTIONS ──────────────────────
+  periods.forEach((p,pi)=>{
+    if(!p.subjects.length)return;
+    const st=pStats(p);if(!st)return;
+    const {avg,med,ecart,best,worst,bestS,worstS,pctAbove,above10,nn,tc,classAvg,myVsClass,v}=st;
+    const [mlbl,mcol,mbg]=gradeMention(avg);
+    let totalCoeff=0;v.forEach(s=>{totalCoeff+=useC?(+s.coeff||1):1});
+
+    html+=`<div class="psec">`;
+    // period header
+    html+=`<div class="psec-hdr">
+      <div>
+        <div class="ptit">${p.name}</div>
+        <div style="font-size:11px;color:#888;margin-top:2px">${nn} matière${nn>1?'s':''} · ${useC?totalCoeff+' coeff. total':''}</div>
+      </div>
+      <div style="text-align:right">
+        <span class="pavg" style="color:${mcol}">${avg.toFixed(2)}</span><span style="font-size:13px;color:#888">/20</span>
+        <span class="tag" style="background:${mbg};color:${mcol};margin-left:8px">${mlbl}</span>
+      </div>
+    </div>`;
+
+    // notes table
+    const hasClass=v.some(s=>s.classAvg!==''&&!isNaN(s.classAvg));
+    html+=`<table><thead><tr>
+      <th>Matière</th>
+      ${useC?'<th class="c">Coeff.</th>':''}
+      ${hasClass?'<th class="c">Moy. classe</th>':''}
+      ${hasClass?'<th class="c">Écart</th>':''}
+      <th style="width:180px">Barre</th>
+      <th class="r">Note /20</th>
+    </tr></thead><tbody>`;
+
+    // sort by grade desc for PDF
+    const sorted=[...p.subjects].sort((a,b)=>{
+      const ga=a.grade!==''&&!isNaN(a.grade)?+a.grade:-1;
+      const gb=b.grade!==''&&!isNaN(b.grade)?+b.grade:-1;
+      return gb-ga;
+    });
+    sorted.forEach(s=>{
+      const g=s.grade!==''&&!isNaN(s.grade)?+s.grade:null;
+      const cl=s.classAvg!==''&&!isNaN(s.classAvg)?+s.classAvg:null;
+      const diff=g!==null&&cl!==null?g-cl:null;
+      const gc=g!==null?gradeMention(g)[1]:'#888';
+      html+=`<tr>
+        <td style="font-weight:500">${s.name||'—'}</td>
+        ${useC?`<td class="c">${s.coeff}</td>`:''}
+        ${hasClass?`<td class="c" style="color:#1565c0">${cl!==null?cl.toFixed(1):'—'}</td>`:''}
+        ${hasClass?`<td class="diff" style="color:${diff===null?'#aaa':diff>0?'#1a7a5a':diff<0?'#8a2020':'#888'}">${diff===null?'—':diff>0?'+'+diff.toFixed(1):diff.toFixed(1)}</td>`:''}
+        <td>${g!==null?miniBar(g,cl):''}</td>
+        <td class="r" style="color:${gc}">${g!==null?g.toFixed(1):'—'}</td>
+      </tr>`;
+    });
+    html+=`<tr class="avgrow"><td>Moyenne ${p.name}</td>${useC?`<td class="c">${totalCoeff}</td>`:''}${hasClass?'<td class="c">—</td>':''}${hasClass?'<td class="diff">—</td>':''}<td></td><td class="r">${avg.toFixed(2)}</td></tr>`;
+    html+=`</tbody></table>`;
+
+    // stats grid
+    html+=`<div class="sg">`;
+    const statsCards=[
+      {l:'Mention',v:`<span class="tag" style="background:${mbg};color:${mcol};font-size:11px">${mlbl}</span>`,raw:true},
+      {l:'Médiane',v:med.toFixed(2),c:mcol},
+      {l:'Écart-type',v:ecart.toFixed(2),c:'#555'},
+      {l:'Amplitude',v:(best-worst).toFixed(1),c:'#555'},
+      {l:'Meilleure',v:`${best.toFixed(1)} – ${bestS.name||'?'}`,c:gradeMention(best)[1],sm:true},
+      {l:'Plus basse',v:`${worst.toFixed(1)} – ${worstS.name||'?'}`,c:gradeMention(worst)[1],sm:true},
+      {l:'Notes ≥ 10',v:`${pctAbove}% (${above10}/${nn})`,c:pctAbove===100?'#1a7a5a':pctAbove>=50?'#8a5500':'#8a2020',sm:true},
+    ];
+    if(avg<10)statsCards.push({l:'Pts pour 10/20',v:(tc*(10-avg)).toFixed(1),c:'#8a2020',sm:true});
+    else if(avg<12)statsCards.push({l:'Pts pour 12/20',v:(tc*(12-avg)).toFixed(1),c:'#8a5500',sm:true});
+    if(classAvg!==null){
+      statsCards.push({l:'Moy. de la classe',v:classAvg.toFixed(2),c:'#1565c0'});
+      statsCards.push({l:'Écart vs classe',v:(myVsClass>=0?'+':'')+myVsClass.toFixed(2),c:myVsClass>=0?'#1a7a5a':'#8a2020'});
+    }
+    statsCards.forEach(s=>{
+      html+=`<div class="sc"><div class="sc-l">${s.l}</div><div class="sc-v" style="font-size:${s.sm?'12px':'17px'};color:${s.c||'#111'}">${s.raw?s.v:s.v}</div></div>`;
+    });
+    html+=`</div>`;
+
+    // class diff ranking (if has class avgs)
+    if(hasClass){
+      const withDiff=v.filter(s=>s.classAvg!==''&&!isNaN(s.classAvg)).map(s=>({name:s.name,g:+s.grade,cl:+s.classAvg,diff:+s.grade-+s.classAvg})).sort((a,b)=>b.diff-a.diff);
+      html+=`<div class="diff-sec">
+        <div class="diff-sec-t">Classement : moi vs classe</div>`;
+      withDiff.forEach(r=>{
+        const cls=r.diff>0.3?'above':r.diff<-0.3?'below':'same';
+        const dc=r.diff>0?'#1a7a5a':r.diff<0?'#8a2020':'#888';
+        html+=`<div class="diff-row ${cls}">
+          <span style="font-weight:500;font-size:12px">${r.name}</span>
+          <span style="font-size:11px;color:#888;font-family:monospace">${r.g.toFixed(1)} / classe: ${r.cl.toFixed(1)}</span>
+          <span style="font-family:monospace;font-weight:700;color:${dc}">${r.diff>0?'+':''}${r.diff.toFixed(1)}</span>
+        </div>`;
+      });
+      html+=`</div>`;
+    }
+
+    html+=`</div>`;// end psec
+  });
+
+  // ── CROSS-PERIOD EVOLUTION (if >1 period) ────
+  const pwg=periods.filter(p=>p.subjects.some(s=>s.grade!==''&&!isNaN(s.grade)));
+  if(pwg.length>1){
+    const nameSet=new Set();
+    pwg.forEach(p=>p.subjects.forEach(s=>{if(s.grade!==''&&!isNaN(s.grade))nameSet.add(s.name)}));
+    const common=[...nameSet].filter(n=>pwg.filter(p=>p.subjects.some(s=>s.name===n&&s.grade!==''&&!isNaN(s.grade))).length>=2);
+    if(common.length){
+      const gc2=`1fr repeat(${pwg.length},60px) 50px`;
+      html+=`<div style="break-inside:avoid;margin-bottom:24px">
+        <div style="font-size:13px;font-weight:700;border-left:4px solid #111;padding-left:10px;margin-bottom:10px">Évolution par matière</div>
+        <table><thead><tr><th>Matière</th>${pwg.map(p=>`<th class="c" style="font-size:10.5px">${p.name}</th>`).join('')}<th class="r" style="font-size:10.5px">Δ total</th></tr></thead><tbody>`;
+      common.sort().forEach(name=>{
+        const grades=pwg.map(p=>{const s=p.subjects.find(sb=>sb.name===name&&sb.grade!==''&&!isNaN(sb.grade));return s?+s.grade:null});
+        const vals=grades.filter(g=>g!==null);
+        const delta=vals.length>=2?vals[vals.length-1]-vals[0]:null;
+        const dc=delta!==null?(delta>0?'#1a7a5a':delta<0?'#8a2020':'#888'):'#888';
+        html+=`<tr><td style="font-weight:500">${name}</td>`;
+        grades.forEach(g=>{
+          const gc3=g!==null?gradeMention(g)[1]:'#aaa';
+          html+=`<td class="c" style="color:${gc3}">${g!==null?g.toFixed(1):'—'}</td>`;
+        });
+        html+=`<td class="r" style="color:${dc}">${delta!==null?(delta>0?'+':'')+delta.toFixed(1):'—'}</td></tr>`;
+      });
+      html+=`</tbody></table></div>`;
+    }
+  }
+
+  html+=`<div class="ftr"><span>Calculateur de moyenne · généré automatiquement</span><span>${date}</span></div>`;
+  html+=`</div></body></html>`;
+
+  const w=window.open('','_blank','width=860,height=980');
+  if(w){w.document.write(html);w.document.close();setTimeout(()=>w.print(),500)}
+  else showMsg('Autorisez les popups pour générer le PDF.',false);
+}
+
+function exportJSON(){
+  const blob=new Blob([JSON.stringify({periods,useCoeff:useC,version:3,exportedAt:new Date().toISOString()},null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='moyennes_'+new Date().toISOString().slice(0,10)+'.json';a.click();showMsg('Export JSON !');
+}
+function exportCSV(){
+  let csv='Période,Matière,Note,Coeff,Moy.classe\n';
+  periods.forEach(p=>p.subjects.forEach(s=>{csv+=`"${p.name}","${s.name}",${s.grade},${s.coeff},${s.classAvg??''}\n`}));
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='moyennes_'+new Date().toISOString().slice(0,10)+'.csv';a.click();showMsg('Export CSV !');
+}
+function importData(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{
+      const data=JSON.parse(ev.target.result);
+      if((data.version===2||data.version===3)&&data.periods){
+        periods=data.periods;
+        periods.forEach(p=>p.subjects.forEach(s=>{if(s.classAvg===undefined)s.classAvg=''}));
+        activePid=periods[0]?.id||null;
+        idc=Math.max(0,...periods.flatMap(p=>p.subjects.map(s=>s.id)));
+        idp=Math.max(0,...periods.map(p=>p.id));
+      } else if(data.subjects){
+        const p=makePeriod('Importé');p.subjects=data.subjects.map(s=>({...s,id:++idc,classAvg:s.classAvg??''}));periods=[p];activePid=p.id;
+      } else throw new Error();
+      if(data.useCoeff!==undefined){useC=data.useCoeff;document.getElementById('ctog').checked=useC}
+      cmpSelPids=null;renderAll();
+      const tot=periods.reduce((a,p)=>a+p.subjects.length,0);
+      showMsg(`${tot} notes importées !`);
+    }catch{showMsg('Fichier invalide.',false)}
+    e.target.value='';
+  };reader.readAsText(file);
+}
+
+setPeriodMode('trimestre');
+</script>
+</body>
+</html>
